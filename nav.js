@@ -200,9 +200,7 @@ document.addEventListener('click', (e) => {
     if (lbl) lbl.textContent = LANG_NAMES[lang] || 'ENGLISH';
   }
 
-  // Auth
-  if (sessionStorage.getItem('necho_logged_in')) App.isLoggedIn = true;
-  if (sessionStorage.getItem('necho_admin'))     App.isAdmin    = true;
+  // Auth is handled by firebase-nav.js (injected below)
 
   // Accessibility
   const acc = localStorage.getItem('necho_acc');
