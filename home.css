@@ -1,0 +1,156 @@
+/* ============================================================
+   NECHO — Home Page Styles (home.css)
+   ============================================================ */
+
+/* ── Shared section label ── */
+.section-label {
+  font-size: 10px; font-weight: 900; text-transform: uppercase;
+  letter-spacing: 0.5em; color: #ef4444; margin-bottom: 1rem;
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 10rem 1.5rem 8rem;
+  background: var(--bg); overflow: hidden;
+}
+.hero-content {
+  width: 100%; max-width: 56rem;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 2.5rem;
+  text-align: center; position: relative; z-index: 10;
+}
+.hero-badge {
+  display: inline-flex; align-items: center;
+  padding: 8px 24px; border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.05);
+  font-size: 9px; font-weight: 900;
+  text-transform: uppercase; letter-spacing: 0.4em;
+  color: #ef4444; backdrop-filter: blur(12px);
+}
+.hero-h1 {
+  font-size: clamp(2.25rem, 6.5vw, 5rem);
+  font-weight: 800; letter-spacing: -0.04em;
+  line-height: 1.05; color: var(--text);
+}
+.hero-h1 span { display: block; color: #dc2626; }
+.hero-p {
+  font-size: clamp(0.9rem, 1.35vw, 1.125rem);
+  color: var(--muted); max-width: 36rem;
+  font-weight: 500; line-height: 1.7; opacity: 0.9;
+}
+.hero-cta {
+  display: inline-flex; align-items: center; gap: 1rem;
+  padding: 1.25rem 3.5rem;
+  background: #dc2626; color: white;
+  border-radius: 16px; font-size: 0.9rem; font-weight: 900;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+  transition: all 0.2s; text-decoration: none;
+  margin-top: 1rem;
+}
+.hero-cta:hover { background: #b91c1c; transform: scale(1.04); }
+.hero-cta:active { transform: scale(0.96); }
+.hero-arrow { transition: transform 0.2s; }
+.hero-cta:hover .hero-arrow { transform: translateX(4px); }
+
+/* ============================================================
+   NARRATIVE
+   ============================================================ */
+.narrative {
+  padding: 7rem 2rem;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.narrative-inner {
+  max-width: 90rem; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr;
+  gap: 5rem; align-items: center;
+}
+@media (min-width: 1024px) { .narrative-inner { grid-template-columns: 1fr 1fr; } }
+.narrative-h2 {
+  font-size: clamp(1.75rem, 3.5vw, 3.15rem);
+  font-weight: 800; letter-spacing: -0.04em;
+  color: var(--text); line-height: 1.15; margin-bottom: 1.5rem;
+}
+.narrative-p {
+  font-size: clamp(0.9rem, 1.1vw, 1.125rem);
+  color: var(--muted); font-weight: 500; line-height: 1.7;
+}
+.narrative-img-wrap {
+  border-radius: 3rem; overflow: hidden;
+  border: 4px solid var(--border);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+  height: 420px; position: relative;
+}
+@media (min-width: 768px) { .narrative-img-wrap { height: 580px; border-radius: 4rem; } }
+.narrative-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+.narrative-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.2), transparent);
+}
+
+/* ============================================================
+   FAQ
+   ============================================================ */
+.faq-section {
+  padding: 7rem 2rem;
+  background: var(--bg);
+}
+.faq-inner { max-width: 56rem; margin: 0 auto; }
+.faq-head  { text-align: center; margin-bottom: 4rem; }
+.faq-h2 {
+  font-size: clamp(1.75rem, 3.5vw, 3.15rem);
+  font-weight: 800; letter-spacing: -0.04em; color: var(--text);
+}
+.faq-item { border-bottom: 1px solid var(--border); }
+.faq-q {
+  width: 100%; display: flex; justify-content: space-between;
+  align-items: center; gap: 1rem; text-align: left;
+  padding: 1.5rem 0; color: var(--text);
+  font-size: clamp(0.9rem, 1.35vw, 1.25rem); font-weight: 700;
+  letter-spacing: -0.02em; transition: color 0.2s;
+}
+.faq-q:hover { color: #ef4444; }
+.faq-chevron { flex-shrink: 0; transition: transform 0.3s; }
+.faq-item.open .faq-chevron { transform: rotate(180deg); }
+.faq-a {
+  display: none; padding-bottom: 1.5rem;
+  color: var(--muted); font-size: 1rem;
+  font-weight: 500; line-height: 1.7;
+}
+.faq-item.open .faq-a { display: block; }
+
+/* ============================================================
+   CTA SECTION
+   ============================================================ */
+.cta-section {
+  position: relative; overflow: hidden;
+  padding: 9rem 2rem;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+.cta-inner { max-width: 56rem; margin: 0 auto; position: relative; z-index: 10; }
+.cta-h2 {
+  font-size: clamp(2.25rem, 5.5vw, 4.5rem);
+  font-weight: 800; letter-spacing: -0.04em;
+  color: var(--text); line-height: 1.1; margin-bottom: 1.5rem;
+}
+.cta-p {
+  font-size: clamp(0.9rem, 1.15vw, 1.125rem);
+  color: var(--muted); font-weight: 500; line-height: 1.7;
+  max-width: 36rem; margin: 0 auto 3rem;
+}
+.cta-btn {
+  padding: 1.35rem 3.25rem; font-size: 0.9rem;
+  letter-spacing: 0.15em; border-radius: 16px;
+}

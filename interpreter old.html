@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Necho Interpreter</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ==================== CSS VARIABLES ==================== */
+        :root {
+            --bg-primary:    #F9FAFB;
+            --bg-secondary:  #FFFFFF;
+            --bg-tertiary:   #F3F4F6;
+            --text-primary:  #111827;
+            --text-secondary:#374151;
+            --text-tertiary: #9CA3AF;
+            --border-color:  #E5E7EB;
+
+            --accent:        #2563EB;
+            --accent-hover:  #1D4ED8;
+            --accent-light:  #EFF6FF;
+            --accent-shadow: rgba(37, 99, 235, 0.25);
+
+            --success:       #10B981;
+            --success-light: #ECFDF5;
+            --danger:        #EF4444;
+            --danger-light:  #FEF2F2;
+            --warning:       #F59E0B;
+
+            --voice:         #7C3AED;
+            --voice-light:   #F5F3FF;
+
+            --shadow-xs:  0 1px 2px rgba(0,0,0,0.05);
+            --shadow-sm:  0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md:  0 4px 8px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04);
+            --shadow-lg:  0 10px 20px rgba(0,0,0,0.08), 0 4px 8px rgba(0,0,0,0.04);
+
+            --r-sm: 8px;
+            --r-md: 12px;
+            --r-lg: 16px;
+            --r-xl: 20px;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary:    #111827;
+            --bg-secondary:  #1F2937;
+            --bg-tertiary:   #374151;
+            --text-primary:  #F9FAFB;
+            --text-secondary:#D1D5DB;
+            --text-tertiary: #6B7280;
+            --border-color:  #374151;
+
+            --accent:        #3B82F6;
+            --accent-hover:  #2563EB;
+            --accent-light:  rgba(59,130,246,0.12);
+            --accent-shadow: rgba(59,130,246,0.3);
+
+            --success-light: rgba(16,185,129,0.12);
+            --danger-light:  rgba(239,68,68,0.12);
+            --voice-light:   rgba(124,58,237,0.12);
+
+            --shadow-xs:  0 1px 2px rgba(0,0,0,0.4);
+            --shadow-sm:  0 1px 3px rgba(0,0,0,0.5);
+            --shadow-md:  0 4px 8px rgba(0,0,0,0.5);
+            --shadow-lg:  0 10px 20px rgba(0,0,0,0.6);
+        }
+
+        /* ==================== RESET ==================== */
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        html { -webkit-text-size-adjust:100%; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        /* ==================== HEADER ==================== */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        .header-content {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 58px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .logo-mark {
+            width: 30px;
+            height: 30px;
+            background: var(--accent);
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+        }
+
+        .logo-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        .logo-sub {
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--text-tertiary);
+            margin-left: 2px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Connection pill */
+        .conn-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-tertiary);
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .conn-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--text-tertiary);
+            transition: background 0.3s ease;
+        }
+
+        .conn-dot.live {
+            background: var(--success);
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.45; }
+        }
+
+        /* Theme button */
+        .theme-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--r-sm);
+            border: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .theme-btn:hover {
+            border-color: var(--accent);
+            background: var(--accent-light);
+        }
+
+        /* ==================== LAYOUT ==================== */
+        .main {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: stretch;   /* panels match height of tallest column */
+        }
+
+        /* ==================== PANEL ==================== */
+        .panel {
+            background: var(--bg-secondary);
+            border-radius: var(--r-xl);
+            padding: 22px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Conversation panel grows to fill grid row height */
+        .panel-conversation {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-conversation .input-area {
+            margin-top: auto;
+            padding-top: 14px;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+
+        .panel-title-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-icon {
+            width: 30px;
+            height: 30px;
+            background: var(--accent-light);
+            border-radius: var(--r-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+        }
+
+        .panel-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+
+        /* ==================== CAMERA ==================== */
+        .camera-wrap {
+            position: relative;
+            border-radius: var(--r-md);
+            overflow: hidden;
+            background: #0a0a0a;
+            aspect-ratio: 4 / 3;
+        }
+
+        #videoFeed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Corner guides */
+        .cam-corners {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .cam-corners::before,
+        .cam-corners::after,
+        .cam-corners > span::before,
+        .cam-corners > span::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-color: rgba(255,255,255,0.55);
+            border-style: solid;
+        }
+
+        .cam-corners::before  { top:10px;    left:10px;    border-width:2px 0 0 2px; border-radius:3px 0 0 0; }
+        .cam-corners::after   { top:10px;    right:10px;   border-width:2px 2px 0 0; border-radius:0 3px 0 0; }
+        .cam-corners > span::before { bottom:10px; left:10px;  border-width:0 0 2px 2px; border-radius:0 0 0 3px; }
+        .cam-corners > span::after  { bottom:10px; right:10px; border-width:0 2px 2px 0; border-radius:0 0 3px 0; }
+
+        /* ==================== STATUS GRID ==================== */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 14px 0;
+        }
+
+        .stat-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--r-md);
+            padding: 12px 14px;
+            transition: all 0.2s ease;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--text-tertiary);
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+
+        /* ==================== BADGES ==================== */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 9px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-on  { background: var(--success-light); color: var(--success); }
+        .badge-off { background: var(--danger-light);  color: var(--danger); }
+
+        /* ==================== BUTTONS ==================== */
+        button {
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .btn {
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: var(--r-sm);
+            min-height: 40px;
+            padding: 9px 18px;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            width: 100%;
+            letter-spacing: 0.01em;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px var(--accent-shadow);
+        }
+
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 9px 16px;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--accent-light);
+        }
+
+        /* Mic button */
+        .btn-mic {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--r-sm);
+            border: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            font-size: 17px;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .btn-mic:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--accent-light);
+        }
+
+        .btn-mic.listening {
+            background: var(--danger);
+            border-color: var(--danger);
+            color: #fff;
+            animation: mic-glow 1.6s ease-in-out infinite;
+        }
+
+        @keyframes mic-glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.45); }
+            50%       { box-shadow: 0 0 0 7px rgba(239,68,68,0); }
+        }
+
+        /* ==================== CHAT ==================== */
+        .chat-wrap {
+            flex: 1;            /* stretch to fill remaining panel height */
+            min-height: 240px;  /* never collapse entirely */
+            overflow-y: auto;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--r-md);
+            scroll-behavior: smooth;
+        }
+
+        .chat-wrap::-webkit-scrollbar { width: 5px; }
+        .chat-wrap::-webkit-scrollbar-track { background: transparent; }
+        .chat-wrap::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+        .chat-wrap::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+        .chat-inner {
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            min-height: 100%;
+        }
+
+        /* ==================== MESSAGES ==================== */
+        .msg {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--r-md);
+            padding: 11px 13px;
+            animation: msg-in 0.22s ease;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .msg:hover { box-shadow: var(--shadow-sm); }
+
+        @keyframes msg-in {
+            from { opacity:0; transform:translateY(7px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+
+        .msg-head {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            margin-bottom: 5px;
+        }
+
+        .msg-badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 4px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        .mb-gesture { background: var(--accent-light);  color: var(--accent); }
+        .mb-voice   { background: var(--voice-light);   color: var(--voice); }
+        .mb-text    { background: var(--success-light); color: var(--success); }
+
+        .msg-auto {
+            font-size: 9px;
+            font-weight: 600;
+            padding: 1px 5px;
+            border-radius: 3px;
+            background: var(--bg-tertiary);
+            color: var(--text-tertiary);
+            border: 1px solid var(--border-color);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .msg-time {
+            margin-left: auto;
+            font-size: 10px;
+            color: var(--text-tertiary);
+        }
+
+        .msg-body {
+            font-size: 14px;
+            color: var(--text-primary);
+            line-height: 1.55;
+            word-break: break-word;
+        }
+
+        .msg-meta {
+            margin-top: 4px;
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        /* ==================== EMPTY STATE ==================== */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            padding: 48px 20px;
+            text-align: center;
+            margin: auto;
+        }
+
+        .empty-icon {
+            font-size: 38px;
+            opacity: 0.35;
+            margin-bottom: 12px;
+        }
+
+        .empty-text {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            max-width: 220px;
+            line-height: 1.5;
+        }
+
+        /* ==================== INPUT AREA ==================== */
+        .input-area {
+            margin-top: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Recording status bar */
+        .rec-bar {
+            display: none;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 12px;
+            background: rgba(239,68,68,0.07);
+            border: 1px solid rgba(239,68,68,0.18);
+            border-radius: var(--r-sm);
+        }
+
+        .rec-bar.show { display: flex; }
+
+        .rec-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--danger);
+            flex-shrink: 0;
+            animation: blink 1s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.15; }
+        }
+
+        .rec-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--danger);
+            flex: 1;
+        }
+
+        .rec-stop {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--danger);
+            background: transparent;
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(239,68,68,0.35);
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: unset;
+        }
+
+        .rec-stop:hover {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        /* Live transcript bubble */
+        .live-bubble {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--voice-light);
+            border: 1px dashed rgba(124,58,237,0.35);
+            border-radius: var(--r-sm);
+            font-size: 13px;
+            color: var(--voice);
+        }
+
+        .live-bubble.show { display: flex; }
+
+        .live-text {
+            flex: 1;
+            font-style: italic;
+        }
+
+        /* Input row */
+        .input-row {
+            display: flex;
+            gap: 8px;
+            align-items: stretch;
+        }
+
+        .text-input {
+            flex: 1;
+            padding: 10px 14px;
+            font-size: 13px;
+            font-family: inherit;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--r-sm);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            min-height: 40px;
+            transition: all 0.2s ease;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: var(--bg-secondary);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+        }
+
+        .text-input::placeholder { color: var(--text-tertiary); }
+
+        /* ==================== WAVEFORM ==================== */
+        .waveform {
+            display: none;
+            align-items: center;
+            gap: 3px;
+            height: 18px;
+        }
+
+        .waveform.show { display: flex; }
+
+        .wave-bar {
+            width: 3px;
+            border-radius: 2px;
+            background: var(--accent);
+            animation: wave 1.1s ease-in-out infinite;
+        }
+
+        .wave-bar:nth-child(1) { height:6px;  animation-delay:0s; }
+        .wave-bar:nth-child(2) { height:11px; animation-delay:0.12s; }
+        .wave-bar:nth-child(3) { height:17px; animation-delay:0.24s; }
+        .wave-bar:nth-child(4) { height:11px; animation-delay:0.36s; }
+        .wave-bar:nth-child(5) { height:6px;  animation-delay:0.48s; }
+
+        @keyframes wave {
+            0%, 100% { transform:scaleY(0.45); opacity:0.5; }
+            50%       { transform:scaleY(1);    opacity:1; }
+        }
+
+        /* ==================== TOAST ==================== */
+        .toast {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%) translateY(0);
+            padding: 10px 20px;
+            border-radius: var(--r-sm);
+            font-size: 13px;
+            font-weight: 500;
+            color: #fff;
+            z-index: 9999;
+            box-shadow: var(--shadow-lg);
+            animation: toast-in 0.25s ease;
+            max-width: 90vw;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        @keyframes toast-in {
+            from { opacity:0; transform:translateX(-50%) translateY(12px); }
+            to   { opacity:1; transform:translateX(-50%) translateY(0); }
+        }
+
+        /* ==================== DIVIDER ==================== */
+        .divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 14px 0;
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 920px) {
+            .main {
+                grid-template-columns: 1fr;
+                padding: 16px;
+                gap: 16px;
+            }
+        }
+
+        @media (max-width: 920px) {
+            /* On single-column layout panels no longer share a row,
+               so the flex stretching doesn't apply. Give chat a fixed height. */
+            .chat-wrap { flex: none; height: 340px; }
+        }
+
+        @media (max-width: 600px) {
+            .header-content { padding: 0 16px; }
+            .conn-pill       { display: none; }
+            .main            { padding: 12px; gap: 12px; }
+            .panel           { padding: 16px; border-radius: var(--r-lg); }
+            .stat-grid       { grid-template-columns: 1fr 1fr; }
+            .chat-wrap       { height: 280px; }
+        }
+
+        @media (max-width: 380px) {
+            .stat-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body data-theme="light">
+
+<!-- ==================== HEADER ==================== -->
+<header class="header">
+    <div class="header-content">
+        <a href="#" class="logo" aria-label="Necho Interpreter home">
+            <div class="logo-mark" aria-hidden="true">✋</div>
+            <span class="logo-name">Necho <span class="logo-sub">Interpreter</span></span>
+        </a>
+        <div class="header-right">
+            <div class="conn-pill" id="connPill" aria-live="polite">
+                <div class="conn-dot" id="connDot"></div>
+                <span id="connLabel">Connecting</span>
+            </div>
+            <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle dark mode">☀️</button>
+        </div>
+    </div>
+</header>
+
+<!-- ==================== MAIN ==================== -->
+<main class="main">
+
+    <!-- ===== Camera Panel ===== -->
+    <section class="panel" aria-label="Camera feed">
+        <div class="panel-header">
+            <div class="panel-title-group">
+                <div class="panel-icon" aria-hidden="true">📹</div>
+                <h2 class="panel-title">Camera Feed</h2>
+            </div>
+        </div>
+
+        <div class="camera-wrap">
+            <img id="videoFeed" src="/video_feed" alt="Live camera feed">
+            <div class="cam-corners" aria-hidden="true"><span></span></div>
+        </div>
+
+        <div class="stat-grid" role="status" aria-live="polite" aria-label="Gesture detection status">
+            <div class="stat-card">
+                <div class="stat-label">Detection</div>
+                <div id="handStatus"><span class="badge badge-off">No Hand</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Gesture</div>
+                <div class="stat-value" id="gestureValue">—</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Confidence</div>
+                <div class="stat-value" id="confidenceValue">—</div>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" id="addGestureBtn" onclick="addGesture()" disabled aria-label="Add detected gesture to conversation">
+            <span aria-hidden="true">＋</span> Add Gesture
+        </button>
+    </section>
+
+    <!-- ===== Conversation Panel ===== -->
+    <section class="panel panel-conversation" aria-label="Conversation">
+        <div class="panel-header">
+            <div class="panel-title-group">
+                <div class="panel-icon" aria-hidden="true">💬</div>
+                <h2 class="panel-title">Conversation</h2>
+            </div>
+            <!-- Waveform (visible when recording) -->
+            <div class="waveform" id="waveform" aria-hidden="true">
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+            </div>
+        </div>
+
+        <!-- Chat messages -->
+        <div class="chat-wrap" id="chatWrap" role="log" aria-live="polite" aria-label="Conversation messages">
+            <div class="chat-inner" id="chatInner">
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-icon" aria-hidden="true">✋</div>
+                    <p class="empty-text">Make a gesture, speak, or type to start a conversation</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input area -->
+        <div class="input-area">
+
+            <!-- Recording indicator -->
+            <div class="rec-bar" id="recBar" role="status" aria-live="polite">
+                <div class="rec-dot" aria-hidden="true"></div>
+                <span class="rec-label">Listening — speak now</span>
+                <button class="rec-stop" onclick="stopMic()" aria-label="Stop recording">Stop</button>
+            </div>
+
+            <!-- Live transcript bubble (shows interim speech text) -->
+            <div class="live-bubble" id="liveBubble" aria-live="assertive">
+                <div class="rec-dot" aria-hidden="true"></div>
+                <span class="live-text" id="liveText">…</span>
+            </div>
+
+            <!-- Text + mic + send row -->
+            <div class="input-row">
+                <input
+                    type="text"
+                    class="text-input"
+                    id="messageInput"
+                    placeholder="Type a message…"
+                    autocomplete="off"
+                    aria-label="Message input"
+                    onkeydown="handleInputKey(event)"
+                >
+                <button class="btn-mic" id="micBtn" onclick="toggleMic()" aria-label="Start voice input" title="Voice input (Chrome/Edge)">🎤</button>
+                <button class="btn btn-secondary" onclick="sendText()" aria-label="Send message">Send</button>
+            </div>
+
+            <div class="divider"></div>
+
+            <button class="btn btn-primary" onclick="exportChat()" aria-label="Export conversation">
+                <span aria-hidden="true">↓</span> Export Conversation
+            </button>
+        </div>
+    </section>
+
+</main>
+
+<script>
+'use strict';
+
+// ============================================================
+// STATE
+// ============================================================
+let lastMsgCount = 0;
+let isListening   = false;
+let recognition   = null;
+let atBottom      = true;
+let serverOnline  = false;
+
+// ============================================================
+// THEME
+// ============================================================
+function toggleTheme() {
+    const body = document.body;
+    const dark  = body.dataset.theme === 'dark';
+    const next  = dark ? 'light' : 'dark';
+    body.dataset.theme = next;
+    localStorage.setItem('necho-theme', next);
+    document.getElementById('themeBtn').textContent = next === 'dark' ? '☀️' : '🌙';
+}
+
+(function applyTheme() {
+    const saved = localStorage.getItem('necho-theme') || 'light';
+    document.body.dataset.theme = saved;
+    document.getElementById('themeBtn').textContent = saved === 'dark' ? '☀️' : '🌙';
+})();
+
+// ============================================================
+// CONNECTION STATUS
+// ============================================================
+function setOnline(online) {
+    if (online === serverOnline) return;
+    serverOnline = online;
+    const dot   = document.getElementById('connDot');
+    const label = document.getElementById('connLabel');
+    if (online) {
+        dot.classList.add('live');
+        label.textContent = 'Live';
+    } else {
+        dot.classList.remove('live');
+        label.textContent = 'Reconnecting';
+    }
+}
+
+// ============================================================
+// STATUS POLLING  (every 500 ms)
+// ============================================================
+function updateStatus() {
+    fetch('/status')
+        .then(r => r.json())
+        .then(data => {
+            setOnline(true);
+            const handEl = document.getElementById('handStatus');
+            handEl.innerHTML = data.hand_detected
+                ? '<span class="badge badge-on">✓ Detected</span>'
+                : '<span class="badge badge-off">No Hand</span>';
+
+            document.getElementById('gestureValue').textContent    = data.gesture || '—';
+            document.getElementById('confidenceValue').textContent = data.gesture
+                ? `${(data.confidence * 100).toFixed(1)}%` : '—';
+
+            const btn = document.getElementById('addGestureBtn');
+            if (data.gesture) {
+                btn.disabled = false;
+                btn.innerHTML = `<span aria-hidden="true">＋</span> Add "${escHtml(data.gesture)}"`;
+            } else {
+                btn.disabled = true;
+                btn.innerHTML = '<span aria-hidden="true">＋</span> Add Gesture';
+            }
+        })
+        .catch(() => setOnline(false));
+}
+
+// ============================================================
+// ADD GESTURE
+// ============================================================
+function addGesture() {
+    fetch('/add_gesture', { method: 'POST' })
+        .then(r => r.json())
+        .then(d => { if (d.success) updateChat(true); else toast(d.message || 'No gesture', 'warn'); })
+        .catch(err => console.error(err));
+}
+
+// ============================================================
+// SEND TEXT MESSAGE
+// ============================================================
+function sendText() {
+    const inp = document.getElementById('messageInput');
+    const txt = inp.value.trim();
+    if (!txt) return;
+    postMessage(txt, 'text');
+    inp.value = '';
+}
+
+function handleInputKey(e) {
+    if (e.key === 'Enter' && !isListening) sendText();
+}
+
+function postMessage(text, type) {
+    fetch('/send_message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, voice: type === 'voice' })
+    })
+    .then(r => r.json())
+    .then(() => updateChat(true))
+    .catch(err => console.error(err));
+}
+
+// ============================================================
+// CHAT DISPLAY
+// ============================================================
+document.getElementById('chatWrap').addEventListener('scroll', () => {
+    const el = document.getElementById('chatWrap');
+    atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
+});
+
+function updateChat(force = false) {
+    fetch('/get_conversation')
+        .then(r => r.json())
+        .then(data => {
+            if (!force && data.length === lastMsgCount) return;
+            lastMsgCount = data.length;
+
+            const inner = document.getElementById('chatInner');
+
+            if (data.length === 0) {
+                inner.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon" aria-hidden="true">✋</div>
+                        <p class="empty-text">Make a gesture, speak, or type to start a conversation</p>
+                    </div>`;
+                return;
+            }
+
+            inner.innerHTML = data.map(buildMsg).join('');
+
+            if (atBottom) {
+                const wrap = document.getElementById('chatWrap');
+                wrap.scrollTop = wrap.scrollHeight;
+            }
+        })
+        .catch(err => console.error(err));
+}
+
+function buildMsg(entry) {
+    if (entry.type === 'gesture') {
+        const autoTag = entry.auto_sent
+            ? '<span class="msg-auto">Auto</span>' : '';
+        return `
+            <article class="msg" aria-label="Gesture message">
+                <div class="msg-head">
+                    <span class="msg-badge mb-gesture">Gesture</span>
+                    ${autoTag}
+                    <span class="msg-time">${escHtml(entry.timestamp)}</span>
+                </div>
+                <div class="msg-body">${escHtml(entry.content)}</div>
+                <div class="msg-meta">Confidence: ${(entry.confidence * 100).toFixed(1)}%</div>
+            </article>`;
+    }
+
+    const isVoice = entry.type === 'voice';
+    return `
+        <article class="msg" aria-label="${isVoice ? 'Voice' : 'Text'} message">
+            <div class="msg-head">
+                <span class="msg-badge ${isVoice ? 'mb-voice' : 'mb-text'}">
+                    ${isVoice ? '🎤 Voice' : 'You'}
+                </span>
+                <span class="msg-time">${escHtml(entry.timestamp)}</span>
+            </div>
+            <div class="msg-body">${escHtml(entry.content)}</div>
+        </article>`;
+}
+
+function escHtml(str) {
+    if (!str) return '';
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+}
+
+// ============================================================
+// EXPORT
+// ============================================================
+function exportChat() {
+    window.location.href = '/export';
+}
+
+// ============================================================
+// SPEECH RECOGNITION
+// ============================================================
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const micSupported = !!SR;
+
+// Web Speech API needs HTTPS or localhost — warn early if neither
+const isSecureContext = location.protocol === 'https:' ||
+                        location.hostname === 'localhost' ||
+                        location.hostname === '127.0.0.1';
+
+if (!micSupported) {
+    const btn = document.getElementById('micBtn');
+    btn.disabled = true;
+    btn.title = 'Speech recognition requires Chrome or Edge';
+} else if (!isSecureContext) {
+    // Show non-blocking warning; don't disable the button yet
+    window.addEventListener('DOMContentLoaded', () => {
+        toast('Mic needs HTTPS or localhost — open via http://localhost:PORT', 'warn');
+    });
+}
+
+function toggleMic() {
+    if (!micSupported) {
+        toast('Speech recognition needs Chrome or Edge.', 'warn');
+        return;
+    }
+    if (isListening) stopMic();
+    else startMic();
+}
+
+function startMic() {
+    recognition = new SR();
+    recognition.continuous      = true;
+    recognition.interimResults  = true;
+    recognition.lang            = 'en-US';
+
+    recognition.onstart = () => {
+        isListening = true;
+        setMicUI(true);
+    };
+
+    recognition.onresult = (event) => {
+        let interim = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const result     = event.results[i];
+            const transcript = result[0].transcript;
+            if (result.isFinal) {
+                // Send each finalised phrase immediately
+                const clean = transcript.trim();
+                if (clean) postMessage(clean, 'voice');
+            } else {
+                interim += transcript;
+            }
+        }
+        // Show interim text
+        showLiveBubble(interim);
+        document.getElementById('messageInput').value = interim;
+    };
+
+    recognition.onerror = (event) => {
+        if (event.error === 'no-speech') return; // ignore silence, keep listening
+        console.error('SR error:', event.error);
+
+        const messages = {
+            network:          'Voice input requires HTTPS or localhost.\nOpen the app at http://localhost:PORT instead of an IP address.',
+            'not-allowed':    'Microphone access denied. Allow it in your browser settings.',
+            'service-not-allowed': 'Voice service blocked. Try Chrome over HTTPS or localhost.',
+            'audio-capture':  'No microphone found. Check your device audio settings.',
+            aborted:          null,   // user-triggered, no message needed
+        };
+        const msg = messages[event.error];
+        if (msg !== null) toast(msg || `Mic error: ${event.error}`, 'error');
+        stopMic();
+    };
+
+    recognition.onend = () => {
+        // Restart automatically while still listening
+        if (isListening) {
+            try { recognition.start(); } catch (e) { /* already started */ }
+        } else {
+            setMicUI(false);
+        }
+    };
+
+    try {
+        recognition.start();
+    } catch (e) {
+        toast('Could not start microphone. Allow access and try again.', 'error');
+    }
+}
+
+function stopMic() {
+    isListening = false;
+    if (recognition) {
+        recognition.stop();
+        recognition = null;
+    }
+    // Send any remaining interim text
+    const inp = document.getElementById('messageInput');
+    const rem = inp.value.trim();
+    if (rem) {
+        postMessage(rem, 'voice');
+        inp.value = '';
+    }
+    setMicUI(false);
+}
+
+function showLiveBubble(text) {
+    const bubble = document.getElementById('liveBubble');
+    const liveEl = document.getElementById('liveText');
+    if (text) {
+        liveEl.textContent = text;
+        bubble.classList.add('show');
+    } else {
+        liveEl.textContent = '…';
+        bubble.classList.remove('show');
+    }
+}
+
+function setMicUI(on) {
+    const btn      = document.getElementById('micBtn');
+    const recBar   = document.getElementById('recBar');
+    const bubble   = document.getElementById('liveBubble');
+    const waveform = document.getElementById('waveform');
+    const inp      = document.getElementById('messageInput');
+
+    if (on) {
+        btn.classList.add('listening');
+        btn.textContent = '⏹';
+        btn.setAttribute('aria-label', 'Stop recording');
+        recBar.classList.add('show');
+        waveform.classList.add('show');
+        inp.placeholder = 'Listening…';
+    } else {
+        btn.classList.remove('listening');
+        btn.textContent = '🎤';
+        btn.setAttribute('aria-label', 'Start voice input');
+        recBar.classList.remove('show');
+        bubble.classList.remove('show');
+        waveform.classList.remove('show');
+        inp.placeholder = 'Type a message…';
+        inp.value = '';
+    }
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function toast(msg, type = 'info') {
+    const prev = document.getElementById('__toast');
+    if (prev) prev.remove();
+    const bg = { info:'#2563EB', warn:'#F59E0B', error:'#EF4444' };
+    const el = document.createElement('div');
+    el.id = '__toast';
+    el.className = 'toast';
+    el.setAttribute('role', 'alert');
+    el.textContent = msg;
+    el.style.background = bg[type] || bg.info;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3600);
+}
+
+// ============================================================
+// BOOTSTRAP POLLING
+// ============================================================
+setInterval(updateStatus, 500);
+setInterval(() => updateChat(false), 700);
+updateStatus();
+updateChat(false);
+</script>
+</body>
+</html>

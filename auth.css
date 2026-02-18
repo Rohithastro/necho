@@ -1,0 +1,41 @@
+/* ============================================================
+   NECHO — Auth Pages Styles (auth.css)
+   Used by: signin.html, signup.html
+   ============================================================ */
+
+.auth-main {
+  min-height: 100vh; background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  padding: 6rem 1.5rem 3rem;
+}
+.auth-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 4rem; padding: 4rem;
+  width: 100%; max-width: 480px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+}
+@media (max-width: 640px) { .auth-card { padding: 2.5rem; border-radius: 2.5rem; } }
+
+.auth-card h1 {
+  font-size: clamp(2.25rem, 4.5vw, 2.75rem);
+  font-weight: 800; letter-spacing: -0.04em;
+  color: var(--text); margin-bottom: 0.75rem;
+}
+.auth-sub {
+  color: var(--muted); font-size: 1rem;
+  font-weight: 500; margin-bottom: 3rem;
+}
+.auth-form {
+  display: flex; flex-direction: column; gap: 2rem;
+}
+.auth-submit {
+  width: 100%; padding: 1.35rem;
+  font-size: 1.125rem; letter-spacing: 0.05em;
+  border-radius: 14px; margin-top: 0.5rem;
+}
+.auth-toggle { text-align: center; margin-top: 3rem; }
+.auth-switch {
+  font-size: 0.875rem; font-weight: 700;
+  color: var(--text); transition: color 0.2s; text-decoration: none;
+}
+.auth-switch:hover { color: #dc2626; }

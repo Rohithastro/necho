@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" data-page="">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Necho — Bridging Silence. Connecting Worlds.</title>
+  <meta name="description" content="Necho is the elite infrastructure for real-time sign language translation. Built with advanced neural cores to dissolve barriers and empower communication globally."/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="home.css"/>
+</head>
+<body data-page="home">
+
+<!-- ===== NAV ===== -->
+<nav id="nav">
+  <div class="nav-inner">
+    <a class="nav-logo" href="index.html">
+      <img class="nav-logo-img" src="logo.svg" alt="Necho"/>
+      <span class="logo-name">NECHO</span>
+    </a>
+    <div class="nav-links">
+      <a class="nav-link active" data-page="home"        href="index.html">HOME</a>
+      <a class="nav-link"        data-page="interpreter" href="interpreter.html">INTERPRETER</a>
+      <a class="nav-link"        data-page="about"       href="about.html">ABOUT US</a>
+      <a class="nav-link"        data-page="blog"        href="blog.html">BLOG</a>
+    </div>
+    <div class="nav-actions">
+      <div class="lang-wrap">
+        <div class="lang-btn">
+          <span id="lang-label">ENGLISH</span>
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <select id="lang-select" class="lang-select" onchange="changeLanguage(this.value)">
+          <option value="en">English</option><option value="hi">Hindi</option>
+          <option value="ta">Tamil</option><option value="te">Telugu</option>
+          <option value="kn">Kannada</option><option value="ml">Malayalam</option>
+          <option value="mr">Marathi</option><option value="gu">Gujarati</option>
+        </select>
+      </div>
+      <div class="acc-wrap">
+        <button class="acc-toggle" onclick="toggleAccPanel()" aria-label="Accessibility">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="4" r="1"/><path d="M6.2 8.5a10 10 0 0 1 11.6 0M12 6v5m0 0l-3 5m3-5l3 5"/></svg>
+        </button>
+        <div id="acc-panel" class="acc-panel">
+          <div class="acc-panel-head">
+            <span class="acc-panel-title">Inclusive Settings</span>
+            <button class="acc-x" onclick="toggleAccPanel()"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          </div>
+          <button id="acc-gray"     class="acc-opt" onclick="toggleAcc('gray')">Grayscale<div class="acc-dot"></div></button>
+          <button id="acc-contrast" class="acc-opt" onclick="toggleAcc('contrast')">High Contrast<div class="acc-dot"></div></button>
+          <button id="acc-motion"   class="acc-opt" onclick="toggleAcc('motion')">Reduced Motion<div class="acc-dot"></div></button>
+          <button id="acc-lineh"    class="acc-opt" onclick="toggleAcc('lineh')">Relaxed Spacing<div class="acc-dot"></div></button>
+          <button id="acc-wordsp"   class="acc-opt" onclick="toggleAcc('wordsp')">Word Spacing<div class="acc-dot"></div></button>
+        </div>
+      </div>
+      <a id="nav-signin"  class="nav-auth" href="signin.html">SIGN IN</a>
+      <button id="nav-signout" class="nav-auth" onclick="logout()" style="display:none">SIGN OUT</button>
+      <button class="hamburger" onclick="toggleMob()">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== MOBILE MENU ===== -->
+<div id="mob-menu">
+  <button class="mob-close" onclick="toggleMob()"><svg width="32" height="32" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  <a class="mob-link active" data-page="home"        href="index.html">HOME</a>
+  <a class="mob-link"        data-page="interpreter" href="interpreter.html">INTERPRETER</a>
+  <a class="mob-link"        data-page="about"       href="about.html">ABOUT US</a>
+  <a class="mob-link"        data-page="blog"        href="blog.html">BLOG</a>
+  <a id="mob-signin"  class="mob-auth" href="signin.html">SIGN IN</a>
+  <button id="mob-signout" class="mob-auth" onclick="logout()" style="display:none">SIGN OUT</button>
+</div>
+
+<!-- ===== MAIN ===== -->
+<main>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="waves"><div class="wave wave-1"></div><div class="wave wave-2"></div></div>
+    <div class="hero-content fade-up">
+      <div class="hero-badge">Universal AI Translation Protocol</div>
+      <h1 class="hero-h1">Bridging Silence.<span>Connecting Worlds.</span></h1>
+      <p class="hero-p">Necho is the elite infrastructure for real-time sign language translation. Built with advanced neural cores to dissolve barriers and empower communication globally.</p>
+      <a class="hero-cta" href="signup.html">
+        <span>Get Started Free</span>
+        <span class="hero-arrow">→</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Narrative -->
+  <section class="narrative">
+    <div class="narrative-inner">
+      <div class="narrative-text">
+        <div class="section-label">The Human Connection</div>
+        <h2 class="narrative-h2">A fundamental human right to expression.</h2>
+        <p class="narrative-p">Over 70 million individuals depend on sign language as their primary mode of interaction. Necho AI is the bridge that turns silence into connection, providing a voice where there was previously a language barrier. Our real-time translator ensures that no conversation is ever lost.</p>
+      </div>
+      <div class="narrative-img-wrap">
+        <img src="https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?q=80&w=1469&auto=format&fit=crop" alt="Person using laptop for sign language communication" class="reveal"/>
+        <div class="narrative-overlay"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq-section">
+    <div class="faq-inner">
+      <div class="faq-head">
+        <div class="section-label">Knowledge Base</div>
+        <h2 class="faq-h2">Everything you need to know about Necho.</h2>
+      </div>
+      <div class="faq-list">
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">What is bridging communication?<svg class="faq-chevron" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>
+          <div class="faq-a">Bridging communication is the act of facilitating a meaningful exchange between people who do not share the same language or medium of expression. At Necho, we bridge communication by using AI to translate complex sign language into spoken text instantly.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">How does Necho AI bridge silence?<svg class="faq-chevron" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>
+          <div class="faq-a">Necho bridges silence by giving users a real-time voice. Using a simple camera feed, our AI recognizes ASL and regional sign dialects, converting them to audio so hearing individuals can participate in the conversation without needing a human interpreter.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">Why is silence so powerful in communication?<svg class="faq-chevron" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>
+          <div class="faq-a">Silence is a fundamental part of the sign language experience. By "Bridging Silence," Necho doesn't replace the beauty of sign language; it connects that world to the hearing world, ensuring that silence is a choice, not a barrier.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">How is technology bridging communication barriers today?<svg class="faq-chevron" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>
+          <div class="faq-a">Modern technology bridges barriers through advanced machine learning. Necho specifically utilizes computer vision and neural networks to process thousands of gesture variations per second, ensuring high accuracy and local dialect recognition.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="waves"><div class="wave wave-1"></div><div class="wave wave-2"></div></div>
+    <div class="cta-inner">
+      <div class="section-label">Regional Fluency</div>
+      <h2 class="cta-h2">40+ Dialects.<br>One Network.</h2>
+      <p class="cta-p">From ASL and BSL to regional variations in Hindi, Tamil, and Telugu. Necho AI is bridging silence and connecting worlds across the entire planet.</p>
+      <a class="btn-red cta-btn" href="signup.html">Start Connecting Now</a>
+    </div>
+  </section>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <img src="logo.svg" alt="Necho" class="footer-logo-img"/>
+      <p class="footer-desc">Universal communication through neural interpretation and inclusive design on a global scale.</p>
+    </div>
+    <div>
+      <div class="footer-col-h">Platform</div>
+      <div class="footer-lnks">
+        <a class="footer-lnk" href="interpreter.html">Interpreter</a>
+        <a class="footer-lnk" href="blog.html">Blog & Insights</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-h">Company</div>
+      <div class="footer-lnks">
+        <a class="footer-lnk" href="about.html">About Us</a>
+        <a class="footer-lnk" href="privacy.html">Privacy Policy</a>
+        <a class="footer-lnk" href="terms.html">Terms of Service</a>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-start;gap:1rem;">
+      <span class="footer-ver">v2.4 Neural Core Active</span>
+      <button id="footer-admin-btn" class="footer-admin" onclick="activateAdmin()">
+        <div class="footer-admin-dot pulse"></div>Administrative Portal
+      </button>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 NECHO. ALL RIGHTS RESERVED.</p>
+    <div class="footer-cities"><span>LONDON</span><span>SAN FRANCISCO</span><span>MUMBAI</span></div>
+  </div>
+</footer>
+
+<!-- ===== THEME BTN ===== -->
+<button id="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+  <svg id="icon-sun" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  <svg id="icon-moon" style="display:none" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+</button>
+
+<script src="nav.js"></script>
+<script src="home.js"></script>
+</body>
+</html>

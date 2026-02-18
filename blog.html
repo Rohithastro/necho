@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Blog — Necho Insights</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="blog.css"/>
+</head>
+<body data-page="blog">
+
+<!-- ===== NAV ===== -->
+<nav id="nav">
+  <div class="nav-inner">
+    <a class="nav-logo" href="index.html"><img class="nav-logo-img" src="logo.svg" alt="Necho"/><span class="logo-name">NECHO</span></a>
+    <div class="nav-links">
+      <a class="nav-link"        data-page="home"        href="index.html">HOME</a>
+      <a class="nav-link"        data-page="interpreter" href="interpreter.html">INTERPRETER</a>
+      <a class="nav-link"        data-page="about"       href="about.html">ABOUT US</a>
+      <a class="nav-link active" data-page="blog"        href="blog.html">BLOG</a>
+    </div>
+    <div class="nav-actions">
+      <div class="lang-wrap">
+        <div class="lang-btn"><span id="lang-label">ENGLISH</span><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <select id="lang-select" class="lang-select" onchange="changeLanguage(this.value)"><option value="en">English</option><option value="hi">Hindi</option><option value="ta">Tamil</option><option value="te">Telugu</option><option value="kn">Kannada</option><option value="ml">Malayalam</option><option value="mr">Marathi</option><option value="gu">Gujarati</option></select>
+      </div>
+      <div class="acc-wrap">
+        <button class="acc-toggle" onclick="toggleAccPanel()"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="4" r="1"/><path d="M6.2 8.5a10 10 0 0 1 11.6 0M12 6v5m0 0l-3 5m3-5l3 5"/></svg></button>
+        <div id="acc-panel" class="acc-panel">
+          <div class="acc-panel-head"><span class="acc-panel-title">Inclusive Settings</span><button class="acc-x" onclick="toggleAccPanel()"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+          <button id="acc-gray"     class="acc-opt" onclick="toggleAcc('gray')">Grayscale<div class="acc-dot"></div></button>
+          <button id="acc-contrast" class="acc-opt" onclick="toggleAcc('contrast')">High Contrast<div class="acc-dot"></div></button>
+          <button id="acc-motion"   class="acc-opt" onclick="toggleAcc('motion')">Reduced Motion<div class="acc-dot"></div></button>
+          <button id="acc-lineh"    class="acc-opt" onclick="toggleAcc('lineh')">Relaxed Spacing<div class="acc-dot"></div></button>
+          <button id="acc-wordsp"   class="acc-opt" onclick="toggleAcc('wordsp')">Word Spacing<div class="acc-dot"></div></button>
+        </div>
+      </div>
+      <a id="nav-signin"  class="nav-auth" href="signin.html">SIGN IN</a>
+      <button id="nav-signout" class="nav-auth" onclick="logout()" style="display:none">SIGN OUT</button>
+      <button class="hamburger" onclick="toggleMob()"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    </div>
+  </div>
+</nav>
+<div id="mob-menu">
+  <button class="mob-close" onclick="toggleMob()"><svg width="32" height="32" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  <a class="mob-link"        data-page="home"        href="index.html">HOME</a>
+  <a class="mob-link"        data-page="interpreter" href="interpreter.html">INTERPRETER</a>
+  <a class="mob-link"        data-page="about"       href="about.html">ABOUT US</a>
+  <a class="mob-link active" data-page="blog"        href="blog.html">BLOG</a>
+  <a id="mob-signin"  class="mob-auth" href="signin.html">SIGN IN</a>
+  <button id="mob-signout" class="mob-auth" onclick="logout()" style="display:none">SIGN OUT</button>
+</div>
+
+<!-- ===== CONTENT ===== -->
+<main class="blog-main">
+
+  <div class="blog-header">
+    <div>
+      <div class="blog-label">Editorial</div>
+      <h1 class="blog-h1">Necho Insights</h1>
+    </div>
+    <div id="admin-add-btn" style="display:none">
+      <button class="add-post-btn" onclick="openModal()">+</button>
+    </div>
+  </div>
+
+  <div class="blog-grid" id="blog-grid">
+    <article class="blog-card">
+      <div class="blog-img"><img src="https://images.unsplash.com/photo-1551434678-e076c223a692?q=80&w=1470&auto=format&fit=crop" alt="ASL Research"/></div>
+      <div class="blog-meta"><span>Research</span><span>Oct 24, 2024</span></div>
+      <h3 class="blog-title">Advancing ASL Regional Dialects in AI</h3>
+    </article>
+    <article class="blog-card">
+      <div class="blog-img"><img src="https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?q=80&w=1469&auto=format&fit=crop" alt="Accessibility"/></div>
+      <div class="blog-meta"><span>Insights</span><span>Oct 20, 2024</span></div>
+      <h3 class="blog-title">Global Digital Accessibility Standards 2025</h3>
+    </article>
+    <article class="blog-card">
+      <div class="blog-img"><img src="https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=1470&auto=format&fit=crop" alt="Partnerships"/></div>
+      <div class="blog-meta"><span>Corporate</span><span>Oct 15, 2024</span></div>
+      <h3 class="blog-title">Institutional Partnerships for Education Access</h3>
+    </article>
+  </div>
+
+</main>
+
+<!-- ===== BLOG EDITOR ===== -->
+<div id="blog-editor" class="blog-editor-overlay">
+
+  <!-- Header -->
+  <div class="editor-header">
+    <button class="editor-back" onclick="closeEditor()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Back
+    </button>
+    <span class="editor-header-title">New Post</span>
+    <div class="editor-header-actions">
+      <button class="btn-red editor-publish-btn" onclick="publishPost()">Publish</button>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="editor-main">
+
+    <!-- Left: Writing area -->
+    <div class="editor-left">
+      <input id="ed-title" class="editor-title" type="text" placeholder="Post Title…"/>
+
+      <div class="editor-slug-row">
+        <span class="editor-slug-label">Slug</span>
+        <span class="editor-slug-prefix">necho.ai/blog/</span>
+        <input id="ed-slug" class="editor-slug-input" type="text" placeholder="auto-generated"/>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="editor-toolbar">
+        <button class="tb-btn" onclick="execCmd('bold')"         title="Bold"><b>B</b></button>
+        <button class="tb-btn" onclick="execCmd('italic')"       title="Italic"><i>I</i></button>
+        <button class="tb-btn" onclick="execCmd('underline')"    title="Underline"><u>U</u></button>
+        <div class="tb-sep"></div>
+        <button class="tb-btn" onclick="insertHeading('h2')"     title="Heading 2">H2</button>
+        <button class="tb-btn" onclick="insertHeading('h3')"     title="Heading 3">H3</button>
+        <div class="tb-sep"></div>
+        <button class="tb-btn" onclick="execCmd('insertUnorderedList')" title="Bullet List">• List</button>
+        <button class="tb-btn" onclick="execCmd('insertOrderedList')"   title="Numbered List">1. List</button>
+        <button class="tb-btn" onclick="execCmd('formatBlock','blockquote')" title="Blockquote">" Quote</button>
+        <div class="tb-sep"></div>
+        <button class="tb-btn" onclick="insertLink()"            title="Insert Link">Link</button>
+        <div class="tb-sep"></div>
+        <button class="tb-btn tb-clear" onclick="execCmd('removeFormat')" title="Clear Formatting">Clear</button>
+      </div>
+
+      <!-- Body -->
+      <div id="ed-body" class="editor-body" contenteditable="true"></div>
+    </div>
+
+    <!-- Right: Sidebar -->
+    <div class="editor-right">
+
+      <!-- Category -->
+      <div class="ed-section">
+        <div class="ed-section-title">Category</div>
+        <select id="ed-category" class="ed-select">
+          <option value="Research">Research</option>
+          <option value="Insights">Insights</option>
+          <option value="Corporate">Corporate</option>
+          <option value="Technology">Technology</option>
+          <option value="Accessibility">Accessibility</option>
+        </select>
+      </div>
+
+      <!-- Featured Image -->
+      <div class="ed-section">
+        <div class="ed-section-title">Featured Image</div>
+        <div class="ed-img-upload">
+          <label class="ed-upload-btn">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Upload image
+            <input id="ed-img-file" type="file" accept="image/*" style="display:none"/>
+          </label>
+          <div class="ed-or">or</div>
+          <input id="ed-img-url" class="ed-text-input" type="url" placeholder="https://image-url.com/…"/>
+          <img id="ed-img-preview" class="ed-img-preview" src="" style="display:none" alt="Preview"/>
+        </div>
+      </div>
+
+      <!-- Tags -->
+      <div class="ed-section">
+        <div class="ed-section-title">Tags <span class="ed-hint">Enter or comma to add · max 10</span></div>
+        <input id="ed-tags-input" class="ed-text-input" type="text" placeholder="Add a tag…"/>
+        <div id="ed-tags-list" class="ed-tags-list"></div>
+      </div>
+
+      <!-- SEO -->
+      <div class="ed-section ed-seo-section">
+        <div class="ed-section-title">SEO</div>
+
+        <label class="ed-label">Meta Description</label>
+        <textarea id="ed-meta-desc" class="ed-textarea" placeholder="Brief description for search engines (120–160 chars)…" maxlength="160"></textarea>
+        <div class="ed-counter-row">
+          <span></span>
+          <span id="ed-char-count" class="ed-counter">0 / 160</span>
+        </div>
+
+        <label class="ed-label">Focus Keyword</label>
+        <input id="ed-keyword" class="ed-text-input" type="text" placeholder="primary keyword…"/>
+
+        <!-- Score -->
+        <div class="seo-score-wrap">
+          <div class="seo-score-header">
+            <span class="seo-score-label">SEO Score</span>
+            <span id="seo-score-val" class="seo-score-val red">0%</span>
+          </div>
+          <div class="seo-bar-track">
+            <div id="seo-score-bar" class="seo-bar-fill red" style="width:0%"></div>
+          </div>
+          <div id="seo-checks" class="seo-checks"></div>
+        </div>
+      </div>
+
+    </div><!-- /editor-right -->
+  </div><!-- /editor-main -->
+</div>
+
+<!-- ===== POST VIEW ===== -->
+<div id="post-view" class="post-view-overlay">
+  <button class="pv-close" onclick="closePostView()" title="Close">
+    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+  <div class="post-view-inner">
+    <img id="pv-img" class="pv-hero-img" src="" alt="" style="display:none"/>
+    <div id="pv-meta" class="pv-meta"></div>
+    <h1 id="pv-title" class="pv-title"></h1>
+    <div id="pv-tags" class="pv-tags"></div>
+    <div id="pv-body" class="pv-body"></div>
+  </div>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="footer-grid">
+    <div><img src="logo.svg" alt="Necho" class="footer-logo-img"/><p class="footer-desc">Universal communication through neural interpretation and inclusive design on a global scale.</p></div>
+    <div><div class="footer-col-h">Platform</div><div class="footer-lnks"><a class="footer-lnk" href="interpreter.html">Interpreter</a><a class="footer-lnk" href="blog.html">Blog & Insights</a></div></div>
+    <div><div class="footer-col-h">Company</div><div class="footer-lnks"><a class="footer-lnk" href="about.html">About Us</a><a class="footer-lnk" href="privacy.html">Privacy Policy</a><a class="footer-lnk" href="terms.html">Terms of Service</a></div></div>
+    <div style="display:flex;flex-direction:column;align-items:flex-start;gap:1rem;"><span class="footer-ver">v2.4 Neural Core Active</span><button id="footer-admin-btn" class="footer-admin" onclick="activateAdmin()"><div class="footer-admin-dot pulse"></div>Administrative Portal</button></div>
+  </div>
+  <div class="footer-bottom"><p>© 2024 NECHO NEURAL LABS. ALL RIGHTS RESERVED.</p><div class="footer-cities"><span>LONDON</span><span>SAN FRANCISCO</span><span>MUMBAI</span></div></div>
+</footer>
+
+<button id="theme-btn" onclick="toggleTheme()">
+  <svg id="icon-sun" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  <svg id="icon-moon" style="display:none" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+</button>
+<script src="nav.js"></script>
+<script src="blog.js"></script>
+</body>
+</html>
