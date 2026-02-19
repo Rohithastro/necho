@@ -537,11 +537,19 @@ function startMic() {
     document.getElementById('msg-input').value = interim;
   };
 
+  var _netRetries = 0;
   recognition.onerror = function(ev) {
     if (ev.error === 'no-speech') return;
+    if (ev.error === 'network' && _netRetries < 3) {
+      // Chrome sometimes throws network on first attempt — retry silently
+      _netRetries++;
+      setTimeout(function() { try { recognition.start(); } catch(e) {} }, 500);
+      return;
+    }
+    _netRetries = 0;
     var msgs = {
       'not-allowed':  'Microphone denied. Allow it in the browser address bar.',
-      'network':      'Voice requires localhost. Open the page at localhost.',
+      'network':      'Voice recognition unavailable. Check your internet connection and try again.',
       'audio-capture':'No microphone found.',
       'aborted':       null,
     };

@@ -3,19 +3,19 @@
    Loaded as type="module" on signin.html only.
    ============================================================ */
 
-import { auth }           from './firebase-config.js';
+import { auth } from './firebase-config.js';
 import { signInWithEmailAndPassword }
-                          from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
 function friendlyError(code) {
   const map = {
-    'auth/invalid-credential':      'Incorrect email or password.',
-    'auth/user-not-found':          'No account found with this email.',
-    'auth/wrong-password':          'Incorrect password. Please try again.',
-    'auth/invalid-email':           'Please enter a valid email address.',
-    'auth/user-disabled':           'This account has been disabled.',
-    'auth/too-many-requests':       'Too many attempts. Please wait a moment and try again.',
-    'auth/network-request-failed':  'Network error. Check your connection and try again.',
+    'auth/invalid-credential':     'Incorrect email or password.',
+    'auth/user-not-found':         'No account found with this email.',
+    'auth/wrong-password':         'Incorrect password. Please try again.',
+    'auth/invalid-email':          'Please enter a valid email address.',
+    'auth/user-disabled':          'This account has been disabled.',
+    'auth/too-many-requests':      'Too many attempts. Please wait a moment and try again.',
+    'auth/network-request-failed': 'Network error. Check your connection and try again.',
   };
   return map[code] || 'Sign in failed. Please try again.';
 }

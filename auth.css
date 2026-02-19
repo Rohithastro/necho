@@ -39,3 +39,9 @@
   color: var(--text); transition: color 0.2s; text-decoration: none;
 }
 .auth-switch:hover { color: #dc2626; }
+
+.auth-error {
+  color: #dc2626; font-size: 0.875rem;
+  font-weight: 600; min-height: 1.25rem;
+  margin: 0;
+}

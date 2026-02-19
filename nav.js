@@ -11,6 +11,7 @@ const App = {
   language:    'en',
   activePage:  document.body.dataset.page || 'home',
 };
+window.App = App;
 
 const LANG_NAMES = {
   en:'ENGLISH', hi:'HINDI', ta:'TAMIL', te:'TELUGU',

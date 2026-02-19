@@ -1,22 +1,21 @@
 /* ============================================================
    NECHO — Sign Up Page Logic (signup-page.js)
    Loaded as type="module" on signup.html only.
-   Creates Firebase Auth user + Firestore profile document.
    ============================================================ */
 
-import { auth, db }       from './firebase-config.js';
+import { auth, db } from './firebase-config.js';
 import { createUserWithEmailAndPassword, updateProfile }
-                          from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { doc, setDoc, serverTimestamp }
-                          from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 function friendlyError(code) {
   const map = {
-    'auth/email-already-in-use':   'An account with this email already exists.',
-    'auth/invalid-email':          'Please enter a valid email address.',
-    'auth/weak-password':          'Password must be at least 6 characters.',
-    'auth/network-request-failed': 'Network error. Check your connection and try again.',
-    'auth/operation-not-allowed':  'Email/password sign-up is not enabled. Contact support.',
+    'auth/email-already-in-use':  'An account with this email already exists.',
+    'auth/invalid-email':         'Please enter a valid email address.',
+    'auth/weak-password':         'Password must be at least 6 characters.',
+    'auth/network-request-failed':'Network error. Check your connection and try again.',
+    'auth/operation-not-allowed': 'Email/password sign-up is not enabled. Contact support.',
   };
   return map[code] || 'Sign up failed. Please try again.';
 }
@@ -41,35 +40,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const password = passEl.value;
     const confirm  = confirmEl.value;
 
-    // Client-side validation
-    if (!name) {
-      errEl.textContent = 'Please enter your full name.'; return;
-    }
-    if (password.length < 6) {
-      errEl.textContent = 'Password must be at least 6 characters.'; return;
-    }
-    if (password !== confirm) {
-      errEl.textContent = 'Passwords do not match.'; return;
-    }
+    if (!name) { errEl.textContent = 'Please enter your full name.'; return; }
+    if (password.length < 6) { errEl.textContent = 'Password must be at least 6 characters.'; return; }
+    if (password !== confirm) { errEl.textContent = 'Passwords do not match.'; return; }
 
     btn.disabled    = true;
     btn.textContent = 'CREATING ACCOUNT…';
 
     try {
-      // Create Firebase Auth user
       const cred = await createUserWithEmailAndPassword(auth, email, password);
-
-      // Set display name on the auth profile
       await updateProfile(cred.user, { displayName: name });
-
-      // Create Firestore user document
       await setDoc(doc(db, 'users', cred.user.uid), {
         name,
         email,
         isAdmin:   false,
         createdAt: serverTimestamp(),
       });
-
       window.location.href = 'index.html';
     } catch (err) {
       errEl.textContent = friendlyError(err.code);
