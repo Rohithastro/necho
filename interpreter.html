@@ -170,12 +170,12 @@
       </div>
     </div>
 
-    <!-- NOTE: no onerror inline — attached via JS after page loads -->
+    <!-- Browser webcam — no server camera needed -->
     <div class="video-box">
-      <img id="video-feed" src="http://localhost:5000/video_feed" alt="Live sign language video feed"/>
+      <video id="video-feed" autoplay playsinline muted></video>
       <div class="video-offline" id="video-offline">
         <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="opacity:.35"><path d="M15 10l4.553-2.069A1 1 0 0121 8.882v6.236a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
-        <p>Backend offline<br/><small>Run <code>python app.py</code></small></p>
+        <p>Camera unavailable<br/><small>Allow camera access in your browser</small></p>
       </div>
     </div>
 
@@ -273,24 +273,29 @@
 ───────────────────────────────────────────────────────────────────────────── */
 'use strict';
 
-const API = 'http://localhost:5000';
+const API = 'https://romram1-necho-backend.hf.space';
 
 // ── State ──────────────────────────────────────────────────────────────────
-let lastCount   = 0;
-let atBottom    = true;
-let isOnline    = false;
-let isListening = false;
-let recognition = null;
+let lastCount     = 0;
+let atBottom      = true;
+let isOnline      = false;
+let isListening   = false;
+let recognition   = null;
+let captureCanvas = null;
+let captureCtx    = null;
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Boot — runs after DOM is ready
 ───────────────────────────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
-  // Attach video error handler here (NOT inline) — this is what fixes the bug
-  const videoEl = document.getElementById('video-feed');
-  if (videoEl) {
-    videoEl.addEventListener('error', showVideoOffline);
-  }
+  // Setup offscreen canvas for capturing video frames
+  captureCanvas        = document.createElement('canvas');
+  captureCanvas.width  = 320;
+  captureCanvas.height = 240;
+  captureCtx           = captureCanvas.getContext('2d');
+
+  // Start browser webcam
+  initWebcam();
 
   // Disable mic button if browser doesn't support Web Speech API
   const hasSR = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
@@ -307,14 +312,33 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Start polling loops
+  // Start conversation polling (gesture status comes from pollStatus via /predict)
   pollStatus();
   pollConversation();
 });
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   Video overlay helpers
+   Webcam — browser captures frames; no server camera needed
 ───────────────────────────────────────────────────────────────────────────── */
+function initWebcam() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    showVideoOffline();
+    return;
+  }
+  navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 }, audio: false })
+    .then(function(stream) {
+      var videoEl = document.getElementById('video-feed');
+      if (videoEl) {
+        videoEl.srcObject = stream;
+        videoEl.onloadedmetadata = function() { showVideoOnline(); };
+      }
+    })
+    .catch(function(err) {
+      console.warn('Webcam error:', err);
+      showVideoOffline();
+    });
+}
+
 function showVideoOffline() {
   const feed    = document.getElementById('video-feed');
   const overlay = document.getElementById('video-offline');
@@ -346,15 +370,9 @@ function setOnline(online) {
   if (hud)       hud.style.borderColor    = online ? '' : 'rgba(255,107,138,.4)';
   if (sub)       sub.textContent          = online
     ? 'Secure Handshake Established'
-    : 'Run python app.py to connect';
+    : 'HF Space offline or sleeping';
 
   if (online) {
-    // Reload stream if it was previously hidden due to an error
-    const feed = document.getElementById('video-feed');
-    if (feed && feed.style.display === 'none') {
-      feed.src          = API + '/video_feed?t=' + Date.now();
-      feed.style.display = 'block';
-    }
     showVideoOnline();
   } else {
     showVideoOffline();
@@ -362,10 +380,22 @@ function setOnline(online) {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   Polling — /status  (every 500 ms)
+   Frame capture — captures a webcam frame, POSTs to /predict  (~4 fps)
+   Updates the gesture status UI from the response.
 ───────────────────────────────────────────────────────────────────────────── */
 function pollStatus() {
-  fetch(API + '/status')
+  var videoEl = document.getElementById('video-feed');
+
+  // Only send a frame when the webcam is ready
+  if (videoEl && captureCtx && videoEl.readyState >= 2 && videoEl.srcObject) {
+    captureCtx.drawImage(videoEl, 0, 0, captureCanvas.width, captureCanvas.height);
+    var dataUrl = captureCanvas.toDataURL('image/jpeg', 0.6);
+
+    fetch(API + '/predict', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ image: dataUrl }),
+    })
     .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
     .then(function(d) {
       setOnline(true);
@@ -391,8 +421,12 @@ function pollStatus() {
         btn.innerHTML = plus + (d.gesture ? ' Add "' + esc(d.gesture) + '"' : ' Add Gesture to Chat');
       }
     })
-    .catch(function() { setOnline(false); })
-    .finally(function() { setTimeout(pollStatus, 500); });
+    .catch(function(err) { console.warn('[predict] fetch failed:', err); setOnline(false); })
+    .finally(function() { setTimeout(pollStatus, 250); });
+  } else {
+    // Webcam not ready yet — retry shortly
+    setTimeout(pollStatus, 250);
+  }
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
