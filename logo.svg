@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 72" fill="none">
+  <defs>
+    <linearGradient id="og" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"   stop-color="#e84d1c"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Icon: OK-hand inside concentric signal arcs -->
+  <g transform="translate(4,4)" filter="url(#glow)">
+    <!-- Soft glow disc -->
+    <circle cx="32" cy="32" r="32" fill="url(#og)" opacity="0.10"/>
+
+    <!-- Concentric signal arcs (left-open) -->
+    <path d="M 12 8  A 31 31 0 0 1 56 56" stroke="url(#og)" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.28"/>
+    <path d="M 16 13 A 25 25 0 0 1 51 51" stroke="url(#og)" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.45"/>
+    <path d="M 19 17 A 19 19 0 0 1 47 47" stroke="url(#og)" stroke-width="1.7" stroke-linecap="round" fill="none" opacity="0.62"/>
+    <path d="M 23 21 A 13 13 0 0 1 43 43" stroke="url(#og)" stroke-width="2.0" stroke-linecap="round" fill="none" opacity="0.80"/>
+
+    <!-- OK hand: "O" ring formed by thumb+index tip -->
+    <circle cx="32" cy="32" r="7.5" stroke="url(#og)" stroke-width="2.2" fill="none"/>
+
+    <!-- Middle finger -->
+    <line x1="36.5" y1="26" x2="39"   y2="14" stroke="url(#og)" stroke-width="2.1" stroke-linecap="round"/>
+    <!-- Ring finger -->
+    <line x1="39.5" y1="28" x2="45"   y2="17" stroke="url(#og)" stroke-width="2.1" stroke-linecap="round"/>
+    <!-- Pinky -->
+    <line x1="41.5" y1="31" x2="49"   y2="23" stroke="url(#og)" stroke-width="2.0" stroke-linecap="round"/>
+    <!-- Index goes down to close the O -->
+    <line x1="31"   y1="24.5" x2="29" y2="13" stroke="url(#og)" stroke-width="2.1" stroke-linecap="round"/>
+    <!-- Palm base (wrist curve) -->
+    <path d="M 26 40 Q 24 48 30 52 Q 36 55 40 50 Q 42 45 40 41" stroke="url(#og)" stroke-width="2.1" stroke-linecap="round" fill="none"/>
+  </g>
+
+  <!-- Divider -->
+  <line x1="76" y1="12" x2="76" y2="60" stroke="rgba(232,77,28,0.20)" stroke-width="1"/>
+
+  <!-- Wordmark -->
+  <text
+    x="88" y="49"
+    font-family="'Inter','Helvetica Neue',Arial,sans-serif"
+    font-size="29"
+    font-weight="800"
+    letter-spacing="0.05em"
+    fill="url(#og)"
+  >NECHO</text>
+</svg>

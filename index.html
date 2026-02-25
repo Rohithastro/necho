@@ -1,0 +1,2810 @@
+<!DOCTYPE html>
+<html lang="en" data-page="" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <meta name="google-site-verification" content="HWPAyhLb2quQJHJuG593aKJeXE1GcYlT0S8btp6L47c" />
+  <title>Necho — Bridging Silence. Connecting Worlds.</title>
+  <meta name="description"
+    content="Elite real-time sign language translation — powered by neural AI. Zero barriers." />
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Iconify -->
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+    rel="stylesheet">
+
+  <!-- Necho shared styles (nav, footer, form, accessibility) -->
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    /* ── Page-level variables override ─────────────────────── */
+    :root {
+      --bg: #050505;
+      --surface: #0f0a08;
+      --border: rgba(255, 255, 255, 0.07);
+      --accent: #e84d1c;
+      --accent2: #f59e0b;
+      --text: #fff5f0;
+      --muted: #8a6a5a;
+      --nav-bg: transparent;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #050505;
+      color: white;
+      overflow-x: hidden;
+    }
+
+    .font-serif {
+      font-family: 'Playfair Display', serif;
+    }
+
+    /* ── Noise overlay ────────────────────────────────────── */
+    .noise-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+      opacity: 0.045;
+      mix-blend-mode: overlay;
+      background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+    }
+
+    /* ── Reveal animation ─────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translate3d(0,20px,0);
+      will-change: opacity, transform;
+      transition: opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1), transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .reveal.active {
+      opacity: 1;
+      transform: translate3d(0,0,0);
+    }
+
+    /* ── Floating hand animations ─────────────────────────── */
+    @keyframes float-hand-left {
+
+      0%,
+      100% {
+        transform: translateY(0) rotate(0deg);
+      }
+
+      50% {
+        transform: translateY(-22px) rotate(2deg);
+      }
+    }
+
+    @keyframes float-hand-right {
+
+      0%,
+      100% {
+        transform: translateY(0) rotate(0deg);
+      }
+
+      50% {
+        transform: translateY(22px) rotate(-2deg);
+      }
+    }
+
+    .animate-float-left {
+      animation: float-hand-left 12s ease-in-out infinite;
+      will-change: transform;
+    }
+
+    .animate-float-right {
+      animation: float-hand-right 14s ease-in-out infinite;
+      will-change: transform;
+    }
+
+    /* ── Parallax cards ───────────────────────────────────── */
+    .parallax-card-up {
+      transform: translateY(var(--scroll-offset-up, 0px));
+    }
+
+    .parallax-card-down {
+      transform: translateY(var(--scroll-offset-down, 0px));
+    }
+
+    /* ── Shimmer text ─────────────────────────────────────── */
+    @keyframes shimmer {
+      from {
+        background-position: -200% center;
+      }
+
+      to {
+        background-position: 200% center;
+      }
+    }
+
+    /* ── Nav overrides (super-design style) ───────────────── */
+    #nav {
+      background: transparent !important;
+      border-bottom: none !important;
+      backdrop-filter: none;
+      transition: background 0.5s, border-color 0.5s, padding 0.4s;
+      padding: 2rem 3rem;
+      height: auto;
+    }
+
+    #nav.scrolled {
+      background: rgba(5, 5, 5, 0.85) !important;
+      backdrop-filter: blur(20px) !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+      padding: 1rem 3rem;
+    }
+
+    .nav-link {
+      color: rgba(255, 255, 255, 0.45);
+      letter-spacing: 0.06em;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .nav-link:hover {
+      color: white;
+    }
+
+    .nav-link.active {
+      color: white;
+    }
+
+    .nav-link.active::after {
+      background: linear-gradient(to right, #e84d1c, #f59e0b);
+    }
+
+    .logo-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ff7043, #f59e0b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 0.02em;
+    }
+
+    .nav-auth {
+      background: rgba(255, 255, 255, 0.95) !important;
+      color: #050505 !important;
+      border-radius: 9999px !important;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      box-shadow: none !important;
+      padding: 0 22px;
+      height: 40px;
+    }
+
+    .nav-auth:hover {
+      background: white !important;
+      transform: scale(1.04) !important;
+    }
+
+    .hamburger {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .lang-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .acc-toggle {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* ── Section label ────────────────────────────────────── */
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.45em;
+      color: rgba(232, 77, 28, 0.9);
+      margin-bottom: 1.25rem;
+    }
+
+    .section-label::before {
+      content: '';
+      display: inline-block;
+      width: 18px;
+      height: 1px;
+      background: linear-gradient(to right, #e84d1c, #f59e0b);
+    }
+
+    /* ── Mobile menu overrides ────────────────────────────── */
+    #mob-menu {
+      background: rgba(5, 5, 5, 0.97);
+      backdrop-filter: blur(32px);
+    }
+
+    .mob-link {
+      color: rgba(255, 255, 255, 0.45);
+      font-family: 'Inter', sans-serif;
+      font-size: 1.25rem;
+    }
+
+    .mob-link:hover,
+    .mob-link.active {
+      color: white;
+    }
+
+    .mob-auth {
+      background: rgba(255, 255, 255, 0.95);
+      color: #050505;
+    }
+
+    /* ── Theme toggle ─────────────────────────────────────── */
+    #theme-btn {
+      background: rgba(17, 17, 17, 0.9);
+      border-color: rgba(255, 255, 255, 0.08);
+      color: #e84d1c;
+    }
+
+    /* ── FAQ accordion ────────────────────────────────────── */
+    .faq-item {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .faq-item:first-of-type {
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .faq-q {
+      color: rgba(255, 255, 255, 0.85);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .faq-q:hover {
+      color: #e84d1c;
+    }
+
+    .faq-chevron {
+      color: rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+      padding: 4px;
+      width: 28px;
+      height: 28px;
+      box-sizing: content-box;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      flex-shrink: 0;
+    }
+
+    .faq-item.open .faq-chevron {
+      transform: rotate(180deg);
+      color: #e84d1c;
+      border-color: rgba(232, 77, 28, 0.5);
+      background: rgba(232, 77, 28, 0.1);
+    }
+
+    .faq-a {
+      overflow: hidden;
+      max-height: 0;
+      padding-bottom: 0;
+      padding-right: 3rem;
+      color: rgba(255, 255, 255, 0.45);
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.8;
+      transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  padding-bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  opacity 0.3s ease;
+      opacity: 0;
+    }
+
+    .faq-item.open .faq-a {
+      max-height: 600px;
+      padding-bottom: 1.75rem;
+      opacity: 1;
+    }
+
+    /* ── CTA btn ──────────────────────────────────────────── */
+    .btn-red {
+      background: linear-gradient(135deg, #e84d1c, #f59e0b) !important;
+      color: white !important;
+      border-radius: 9999px !important;
+      box-shadow: 0 0 50px rgba(232, 77, 28, 0.4) !important;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+    }
+
+    .btn-red:hover {
+      opacity: 0.9;
+      transform: scale(1.04) translateY(-2px) !important;
+      box-shadow: 0 0 70px rgba(232, 77, 28, 0.6) !important;
+    }
+
+    /* ── Footer overrides ─────────────────────────────────── */
+    footer {
+      background: #050505 !important;
+      border-color: rgba(255, 255, 255, 0.05) !important;
+      padding: 5rem 4rem 3rem;
+    }
+
+    .footer-col-h {
+      color: rgba(232, 77, 28, 0.8) !important;
+    }
+
+    .footer-lnk:hover {
+      color: white !important;
+    }
+
+    .footer-desc {
+      color: rgba(255, 255, 255, 0.3) !important;
+    }
+
+    .footer-ver {
+      color: rgba(232, 77, 28, 0.7) !important;
+      border-color: rgba(232, 77, 28, 0.2) !important;
+      background: rgba(232, 77, 28, 0.05) !important;
+    }
+
+    .footer-admin {
+      color: rgba(255, 255, 255, 0.25) !important;
+    }
+
+    .footer-admin-dot {
+      background: #e84d1c !important;
+    }
+
+    .footer-bottom {
+      color: rgba(255, 255, 255, 0.2) !important;
+      border-color: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    /* ── Accessibility panel ──────────────────────────────── */
+    .acc-panel {
+      background: #111;
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .acc-opt {
+      border-color: rgba(255, 255, 255, 0.07);
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .acc-opt:hover {
+      border-color: rgba(232, 77, 28, 0.5);
+      color: white;
+    }
+
+    .acc-opt.on {
+      border-color: #e84d1c;
+      color: white;
+      background: rgba(232, 77, 28, 0.1);
+    }
+
+    .acc-dot {
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .acc-opt.on .acc-dot {
+      background: #e84d1c;
+      border-color: #e84d1c;
+    }
+
+    /* ── New sections ─────────────────────────────────────── */
+    .impact-num {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 700;
+      line-height: 1;
+      background: linear-gradient(135deg, #ff6b35, #f59e0b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .process-step-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 4rem;
+      font-weight: 700;
+      line-height: 1;
+      color: rgba(232, 77, 28, 0.15);
+      position: absolute;
+      top: -1rem;
+      right: 1.5rem;
+    }
+
+    .testimonial-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 1.5rem;
+      padding: 2rem;
+      transition: border-color 0.4s ease, transform 0.4s ease;
+    }
+
+    .testimonial-card:hover {
+      border-color: rgba(232, 77, 28, 0.3);
+      transform: translateY(-4px);
+    }
+
+    .quote-mark {
+      font-family: 'Playfair Display', serif;
+      font-size: 5rem;
+      line-height: 0.5;
+      color: rgba(232, 77, 28, 0.25);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    /* ── Hand container (for scroll convergence) ──────────── */
+    #hand-left-wrap,
+    #hand-right-wrap {
+      transition: none;
+      will-change: transform;
+    }
+
+    /* ── Light mode overrides for page-specific styles ──────── */
+    html.light #nav {
+      background: rgba(255,248,242,0.92) !important;
+      border-bottom: 1px solid rgba(30,15,5,0.08) !important;
+    }
+
+    html.light #nav.scrolled {
+      background: rgba(255,248,242,0.97) !important;
+      backdrop-filter: blur(20px) !important;
+      border-bottom: 1px solid rgba(30,15,5,0.1) !important;
+    }
+
+    html.light .nav-link {
+      color: rgba(30,15,5,0.45) !important;
+    }
+
+    html.light .nav-link:hover,
+    html.light .nav-link.active {
+      color: #1a0f08 !important;
+    }
+
+    html.light #mob-menu {
+      background: rgba(253,248,243,0.98) !important;
+    }
+
+    html.light .mob-link {
+      color: rgba(30,15,5,0.45) !important;
+    }
+
+    html.light .mob-link:hover,
+    html.light .mob-link.active {
+      color: #1a0f08 !important;
+    }
+
+    html.light .faq-item {
+      border-color: rgba(30,15,5,0.1) !important;
+    }
+
+    html.light .faq-q {
+      color: #1a0f08 !important;
+    }
+
+    html.light .faq-chevron {
+      color: rgba(30,15,5,0.4) !important;
+      background: rgba(30,15,5,0.04) !important;
+      border-color: rgba(30,15,5,0.1) !important;
+    }
+
+    html.light .faq-a {
+      color: rgba(30,15,5,0.6) !important;
+    }
+
+    html.light footer {
+      background: #ffede0 !important;
+      border-color: rgba(30,15,5,0.1) !important;
+    }
+
+    html.light .footer-desc   { color: rgba(30,15,5,0.45) !important; }
+    html.light .footer-admin  { color: rgba(30,15,5,0.35) !important; }
+    html.light .footer-bottom {
+      color: rgba(30,15,5,0.35) !important;
+      border-color: rgba(30,15,5,0.08) !important;
+    }
+
+    html.light .acc-panel {
+      background: #fff4ec !important;
+      border-color: rgba(30,15,5,0.1) !important;
+    }
+
+    html.light .acc-opt {
+      border-color: rgba(30,15,5,0.1) !important;
+      color: rgba(30,15,5,0.5) !important;
+    }
+
+    html.light .acc-dot {
+      border-color: rgba(30,15,5,0.2) !important;
+    }
+
+    html.light #theme-btn {
+      background: #fff4ec !important;
+      border-color: rgba(30,15,5,0.1) !important;
+    }
+  </style>
+</head>
+
+<body data-page="home">
+
+  <!-- Noise overlay -->
+  <div class="noise-overlay"></div>
+
+  <!-- ===== NAV ===== -->
+  <nav id="nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="index.html">
+        <img class="nav-logo-img" src="logo.svg" alt="Necho" style="height:38px;" />
+      </a>
+      <div class="nav-links">
+        <a class="nav-link active" data-page="home" href="index.html">Home</a>
+        <a class="nav-link" data-page="interpreter" href="interpreter.html">Interpreter</a>
+        <a class="nav-link" data-page="about" href="about.html">About Us</a>
+        <a class="nav-link" data-page="blog" href="blog.html">Blog</a>
+      </div>
+      <div class="nav-actions">
+        <div class="lang-wrap">
+          <div class="lang-btn">
+            <span id="lang-label">ENGLISH</span>
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </div>
+          <select id="lang-select" class="lang-select" onchange="changeLanguage(this.value)">
+            <option value="en">English</option>
+            <option value="hi">Hindi</option>
+            <option value="ta">Tamil</option>
+            <option value="te">Telugu</option>
+            <option value="kn">Kannada</option>
+            <option value="ml">Malayalam</option>
+            <option value="mr">Marathi</option>
+            <option value="gu">Gujarati</option>
+          </select>
+        </div>
+        <div class="acc-wrap">
+          <button class="acc-toggle" onclick="toggleAccPanel()" aria-label="Accessibility">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="12" cy="4" r="1" />
+              <path d="M6.2 8.5a10 10 0 0 1 11.6 0M12 6v5m0 0l-3 5m3-5l3 5" />
+            </svg>
+          </button>
+          <div id="acc-panel" class="acc-panel">
+            <div class="acc-panel-head">
+              <span class="acc-panel-title">Inclusive Settings</span>
+              <button class="acc-x" onclick="toggleAccPanel()"><svg width="16" height="16" fill="none"
+                  stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg></button>
+            </div>
+            <button id="acc-gray" class="acc-opt" onclick="toggleAcc('gray')">Grayscale<div class="acc-dot"></div>
+            </button>
+            <button id="acc-contrast" class="acc-opt" onclick="toggleAcc('contrast')">High Contrast<div class="acc-dot">
+              </div></button>
+            <button id="acc-motion" class="acc-opt" onclick="toggleAcc('motion')">Reduced Motion<div class="acc-dot">
+              </div></button>
+            <button id="acc-lineh" class="acc-opt" onclick="toggleAcc('lineh')">Relaxed Spacing<div class="acc-dot">
+              </div></button>
+            <button id="acc-wordsp" class="acc-opt" onclick="toggleAcc('wordsp')">Word Spacing<div class="acc-dot">
+              </div></button>
+          </div>
+        </div>
+        <a id="nav-signin" class="nav-auth" href="signin.html">Sign In</a>
+        <button id="nav-signout" class="nav-auth" onclick="logout()" style="display:none">Sign Out</button>
+        <button class="hamburger" onclick="toggleMob()">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== MOBILE MENU ===== -->
+  <div id="mob-menu">
+    <button class="mob-close" onclick="toggleMob()"><svg width="30" height="30" fill="none" stroke="white"
+        stroke-width="2" viewBox="0 0 24 24">
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+      </svg></button>
+    <a class="mob-link active" data-page="home" href="index.html">Home</a>
+    <a class="mob-link" data-page="interpreter" href="interpreter.html">Interpreter</a>
+    <a class="mob-link" data-page="about" href="about.html">About Us</a>
+    <a class="mob-link" data-page="blog" href="blog.html">Blog</a>
+    <a id="mob-signin" class="mob-auth" href="signin.html">Sign In</a>
+    <button id="mob-signout" class="mob-auth" onclick="logout()" style="display:none">Sign Out</button>
+  </div>
+
+  <!-- ===== MAIN ===== -->
+  <main>
+
+    <!-- ══ HERO ══════════════════════════════════════════════════ -->
+    <section class="relative min-h-screen flex items-center justify-center overflow-hidden pt-32 pb-20 bg-[#050505]">
+
+      <!-- Atmospheric background -->
+      <div class="absolute inset-0 z-0 pointer-events-none select-none">
+        <div class="absolute top-0 left-0 w-full h-full opacity-60 mix-blend-screen">
+          <img src="https://framerusercontent.com/images/9zvwRJAavKKacVyhFCwHyXW1U.png?width=1536&height=1024" alt=""
+            class="w-full h-full object-cover object-center opacity-80">
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#050505] z-10"></div>
+      </div>
+
+      <!-- Floating hand — left (signing hand, perfect for Necho) -->
+      <div id="hand-left-wrap"
+        class="absolute -left-[10%] top-[-10%] md:left-[-5%] md:top-[-15%] w-[50vw] md:w-[38vw] max-w-[760px] z-10 pointer-events-none mix-blend-hard-light opacity-80 animate-float-left">
+        <img src="https://framerusercontent.com/images/KNhiA5A2ykNYqNkj04Hk6BVg5A.png?width=1540&height=1320"
+          alt="Hand signing" class="w-full h-auto object-contain">
+      </div>
+
+      <!-- Floating hand — right -->
+      <div id="hand-right-wrap"
+        class="absolute -right-[10%] bottom-[-10%] md:right-[-5%] md:bottom-[-5%] w-[45vw] md:w-[33vw] max-w-[680px] z-10 pointer-events-none mix-blend-hard-light opacity-80 animate-float-right">
+        <img src="https://hmidvlypfhbjefhcwwkt.supabase.co/storage/v1/object/public/images/d1c39160-75d0-407e-ad0e-d83bebb1278d/21c6392d-c1b4-49ae-af47-0f941ca247a3.png?width=1542&height=1002"
+          alt="Hand receiving" class="w-full h-auto object-contain">
+      </div>
+
+      <!-- Hero content -->
+      <div class="container mx-auto px-6 relative z-20 text-center flex flex-col items-center justify-center">
+        <div id="hero-content-wrapper" class="max-w-4xl mx-auto flex flex-col items-center gap-6">
+
+          <div class="reveal">
+            <div
+              class="inline-flex items-center gap-3 px-5 py-2 rounded-full border border-orange-900/30 bg-orange-950/20 backdrop-blur-sm text-[10px] font-semibold uppercase tracking-[0.4em] text-orange-300 mb-2">
+              <span class="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse"></span>
+              Universal AI Translation Protocol
+            </div>
+          </div>
+
+          <div class="reveal" style="transition-delay:100ms">
+            <h1
+              class="font-serif text-5xl md:text-7xl font-medium leading-[1.05] tracking-tight text-[#ffe0e0] mix-blend-overlay"
+              style="text-shadow: 0 0 40px rgba(255,255,255,0.5);">
+              Bridging Silence.<br />
+              <span class="italic font-light">Connecting Worlds.</span>
+            </h1>
+          </div>
+
+          <div class="reveal" style="transition-delay:220ms">
+            <p class="text-base md:text-lg text-[#ffe0e0]/80 max-w-xl mx-auto font-light tracking-wide leading-relaxed mix-blend-overlay"
+              style="text-shadow: 0 0 20px rgba(255,255,255,0.4);">
+              Elite real-time sign language translation powered by neural AI. Zero barriers.
+            </p>
+          </div>
+
+          <div class="reveal flex flex-col items-center gap-5" style="transition-delay:380ms">
+            <a href="signup.html"
+              class="relative group inline-flex items-center gap-3 px-8 py-3.5 rounded-full font-semibold text-sm tracking-wide text-white"
+              style="background: linear-gradient(135deg,#e84d1c,#f59e0b); box-shadow: 0 0 60px rgba(232,77,28,0.45);">
+              <span
+                class="absolute inset-0 rounded-full bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+              <span class="relative">Get Started Free</span>
+              <span class="relative transition-transform duration-200 group-hover:translate-x-1">→</span>
+            </a>
+
+            <!-- Stats row -->
+            <div class="flex flex-wrap justify-center items-center gap-8 mt-4 text-center">
+              <div class="flex flex-col items-center gap-0.5">
+                <span class="font-serif text-2xl font-semibold text-white/90">70M+</span>
+                <span class="text-[9px] uppercase tracking-[0.3em] text-white/35 font-medium">Users Reached</span>
+              </div>
+              <div class="w-px h-8 bg-white/10"></div>
+              <div class="flex flex-col items-center gap-0.5">
+                <span class="font-serif text-2xl font-semibold text-white/90">40+</span>
+                <span class="text-[9px] uppercase tracking-[0.3em] text-white/35 font-medium">Sign Dialects</span>
+              </div>
+              <div class="w-px h-8 bg-white/10"></div>
+              <div class="flex flex-col items-center gap-0.5">
+                <span class="font-serif text-2xl font-semibold text-white/90">&lt;80ms</span>
+                <span class="text-[9px] uppercase tracking-[0.3em] text-white/35 font-medium">Response Time</span>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-4 text-[10px] text-white/30 uppercase tracking-[0.25em] mt-4 font-mono">
+              <span id="current-time">--:-- --</span>
+              <span class="w-px h-3 bg-white/15"></span>
+              <span>Live System</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ MISSION ════════════════════════════════════════════════ -->
+    <section id="expertise" class="py-16 relative bg-[#050505]" style="border-top: 1px solid rgba(255,255,255,0.04);">
+      <div class="container mx-auto px-6">
+
+        <!-- 2-col split: text left, Spline right -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center max-w-7xl mx-auto">
+
+          <!-- LEFT — text -->
+          <div class="reveal flex flex-col gap-8">
+            <div class="section-label">The Human Connection</div>
+
+            <h2 class="font-serif text-4xl md:text-5xl lg:text-6xl leading-[1.05] text-white/90">
+              A fundamental<br />human right<br />
+              <span class="italic font-light"
+                style="background: linear-gradient(135deg,#ff6b35,#f59e0b); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">to
+                expression.</span>
+            </h2>
+
+            <p class="text-lg text-white/35 leading-relaxed font-light max-w-md">
+              Over 70 million individuals depend on sign language as their primary mode of interaction.
+              Necho gives every conversation a voice — no barriers, no wait, no loss.
+            </p>
+
+            <!-- Language trust row -->
+            <div class="flex flex-wrap items-center gap-6 pt-4">
+              <span
+                class="font-semibold text-sm tracking-[0.35em] text-white/20 hover:text-white/50 transition-colors duration-500 cursor-default">ASL</span>
+              <div class="w-px h-4 bg-white/10"></div>
+              <span
+                class="font-semibold text-sm tracking-[0.35em] text-white/20 hover:text-white/50 transition-colors duration-500 cursor-default">BSL</span>
+              <div class="w-px h-4 bg-white/10"></div>
+              <span
+                class="font-semibold text-sm tracking-[0.35em] text-white/20 hover:text-white/50 transition-colors duration-500 cursor-default">ISL</span>
+              <div class="w-px h-4 bg-white/10"></div>
+              <span
+                class="font-semibold text-sm tracking-[0.35em] text-white/20 hover:text-white/50 transition-colors duration-500 cursor-default">+
+                37 more</span>
+            </div>
+
+            <a href="interpreter.html"
+              class="self-start inline-flex items-center gap-3 px-7 py-3.5 rounded-full text-sm font-semibold text-white border border-white/10 hover:border-orange-600/40 hover:bg-orange-950/20 transition-all duration-300">
+              Try the Interpreter
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="7" y1="17" x2="17" y2="7" />
+                <polyline points="7 7 17 7 17 17" />
+              </svg>
+            </a>
+          </div>
+
+          <!-- RIGHT — Spline 3D scene -->
+          <div class="reveal relative" style="transition-delay: 150ms;">
+            <!-- Card frame -->
+            <div class="relative rounded-3xl overflow-hidden" style="height: 520px; background: #0a0502;">
+
+              <!-- Subtle ambient glow -->
+              <div class="absolute inset-0 pointer-events-none"
+                style="background: radial-gradient(ellipse 70% 60% at 60% 40%, rgba(232,77,28,0.07) 0%, transparent 70%);">
+              </div>
+
+              <!-- Spline canvas -->
+              <canvas id="spline-canvas" class="w-full h-full block"></canvas>
+
+              <!-- Loading state -->
+              <div id="spline-loader" class="absolute inset-0 flex items-center justify-center">
+                <div
+                  style="width:32px;height:32px;border:2px solid rgba(255,255,255,0.08);border-top-color:#e84d1c;border-radius:50%;animation:spin 0.8s linear infinite;">
+                </div>
+              </div>
+
+              <!-- Bottom label -->
+              <div class="absolute bottom-4 left-5 flex items-center gap-2 pointer-events-none">
+                <div class="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse"></div>
+                <span class="text-[9px] uppercase tracking-[0.35em] text-white/25 font-medium">Interactive · Drag to
+                  explore</span>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /grid -->
+      </div>
+
+      <style>
+        @keyframes spin {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+      </style>
+
+      <!-- Spline runtime via ESM CDN — no npm build needed -->
+      <script type="module">
+        import { Application } from 'https://unpkg.com/@splinetool/runtime@1.9.28/build/runtime.js';
+        const canvas = document.getElementById('spline-canvas');
+        const loader = document.getElementById('spline-loader');
+        const app = new Application(canvas);
+        app.load('https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode')
+          .then(() => { if (loader) loader.style.display = 'none'; })
+          .catch(() => { if (loader) loader.style.display = 'none'; });
+      </script>
+
+    </section>
+
+    <!-- ══ FLIP CARDS ════════════════════════════════════════════ -->
+    <section id="works" class="py-20 relative overflow-hidden bg-[#050505]">
+      <!-- dot pattern -->
+      <div class="absolute inset-0 opacity-[0.05] pointer-events-none"
+        style="background-image: radial-gradient(circle, rgba(232,77,28,0.6) 1px, transparent 1px); background-size: 44px 44px;">
+      </div>
+
+      <style>
+        /* ── KokonutUI Flip Cards ──────────────────────────────── */
+        .flip-scene {
+          perspective: 2000px;
+          height: 340px;
+          width: 100%;
+          max-width: 300px;
+          margin: 0 auto;
+        }
+
+        .flip-inner {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          transform-style: preserve-3d;
+          transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .flip-scene:hover .flip-inner {
+          transform: rotateY(180deg);
+        }
+
+        .flip-front,
+        .flip-back {
+          position: absolute;
+          inset: 0;
+          backface-visibility: hidden;
+          border-radius: 1.35rem;
+          overflow: hidden;
+        }
+
+        /* Front face */
+        .flip-front {
+          background: linear-gradient(to bottom, #1a1008, #050505);
+          border: 1px solid rgba(255, 255, 255, 0.07);
+          display: flex;
+          flex-direction: column;
+          transition: box-shadow 0.5s, border-color 0.5s;
+        }
+
+        .flip-scene:hover .flip-front {
+          border-color: rgba(232, 77, 28, 0.25);
+          box-shadow: 0 20px 60px rgba(232, 77, 28, 0.12);
+        }
+
+        /* Floating orb animation — front face center */
+        .flip-orb-area {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .flip-orb-ring {
+          position: absolute;
+          width: 56px;
+          height: 56px;
+          border-radius: 50%;
+          animation: koko-scale 3s linear infinite;
+          opacity: 0;
+          box-shadow: 0 0 40px rgba(232, 77, 28, 0.5);
+          background: radial-gradient(circle, rgba(232, 77, 28, 0.35) 0%, transparent 70%);
+        }
+
+        .flip-scene:hover .flip-orb-ring {
+          animation-duration: 2s;
+        }
+
+        @keyframes koko-scale {
+          0% {
+            transform: scale(2.2);
+            opacity: 0;
+          }
+
+          50% {
+            transform: scale(1) translateY(-4px);
+            opacity: 1;
+          }
+
+          100% {
+            transform: scale(0.15) translateY(4px);
+            opacity: 0;
+          }
+        }
+
+        /* Front bottom text */
+        .flip-front-foot {
+          padding: 1.25rem 1.35rem;
+          display: flex;
+          align-items: flex-end;
+          justify-content: space-between;
+          gap: 12px;
+        }
+
+        .flip-front-foot .flip-title {
+          font-family: 'Playfair Display', serif;
+          font-size: 1.15rem;
+          font-weight: 600;
+          color: rgba(255, 255, 255, 0.9);
+          letter-spacing: -0.02em;
+          line-height: 1.2;
+          margin-bottom: 0.3rem;
+          transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .flip-front-foot .flip-subtitle {
+          font-size: 0.75rem;
+          color: rgba(255, 255, 255, 0.4);
+          font-weight: 400;
+          line-height: 1.3;
+          transition: transform 0.5s 50ms cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .flip-scene:hover .flip-front-foot .flip-title,
+        .flip-scene:hover .flip-front-foot .flip-subtitle {
+          transform: translateY(-4px);
+        }
+
+        .flip-repeat-icon {
+          flex-shrink: 0;
+          position: relative;
+          width: 24px;
+          height: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #f59e0b;
+          transition: transform 0.3s;
+        }
+
+        .flip-scene:hover .flip-repeat-icon {
+          transform: rotate(-15deg) scale(1.15);
+        }
+
+        /* Back face */
+        .flip-back {
+          background: linear-gradient(to bottom, #1a1008, #050505);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          transform: rotateY(180deg);
+          display: flex;
+          flex-direction: column;
+          padding: 1.5rem;
+          transition: box-shadow 0.5s;
+        }
+
+        .flip-scene:hover .flip-back {
+          box-shadow: 0 20px 60px rgba(232, 77, 28, 0.15);
+        }
+
+        .flip-back-title {
+          font-family: 'Playfair Display', serif;
+          font-size: 1.15rem;
+          font-weight: 600;
+          color: rgba(255, 255, 255, 0.9);
+          letter-spacing: -0.02em;
+          margin-bottom: 0.4rem;
+        }
+
+        .flip-back-desc {
+          font-size: 0.75rem;
+          color: rgba(255, 255, 255, 0.35);
+          font-weight: 400;
+          line-height: 1.5;
+          margin-bottom: 1.25rem;
+        }
+
+        .flip-feature {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 0.8rem;
+          color: rgba(255, 255, 255, 0.65);
+          margin-bottom: 0.45rem;
+          opacity: 0;
+          transform: translateX(-10px);
+          transition: opacity 0.4s, transform 0.4s;
+        }
+
+        .flip-scene:hover .flip-feature {
+          opacity: 1;
+          transform: translateX(0);
+        }
+
+        .flip-feature-dot {
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+          flex-shrink: 0;
+          background: #f59e0b;
+        }
+
+        .flip-arrow-svg {
+          width: 14px;
+          height: 14px;
+          color: #f59e0b;
+        }
+
+        .flip-back-cta {
+          margin-top: auto;
+          padding-top: 1.1rem;
+          border-top: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .flip-cta-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.6rem 0.75rem;
+          border-radius: 10px;
+          background: rgba(255, 255, 255, 0.03);
+          cursor: pointer;
+          transition: background 0.3s, transform 0.3s;
+        }
+
+        .flip-cta-row:hover {
+          background: rgba(232, 77, 28, 0.1);
+          transform: scale(1.02);
+        }
+
+        .flip-cta-label {
+          font-size: 0.8rem;
+          font-weight: 600;
+          color: rgba(255, 255, 255, 0.8);
+          transition: color 0.3s;
+        }
+
+        .flip-cta-row:hover .flip-cta-label {
+          color: #f59e0b;
+        }
+
+        .flip-cta-icon {
+          width: 16px;
+          height: 16px;
+          color: #f59e0b;
+          transition: transform 0.3s;
+        }
+
+        .flip-cta-row:hover .flip-cta-icon {
+          transform: translateX(3px) scale(1.1);
+        }
+      </style>
+
+      <div class="container mx-auto px-6 relative z-10">
+        <div class="reveal mb-28 text-center">
+          <div class="section-label mb-4">How Necho Works</div>
+          <h2 class="font-serif text-5xl md:text-7xl">
+            Sign it.<br />
+            <span class="italic font-light">Hear it instantly.</span>
+          </h2>
+        </div>
+
+        <!-- 3-card flip grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 justify-items-center max-w-5xl mx-auto">
+
+          <!-- ── Card 1: Sign Recognition ── -->
+          <div class="flip-scene reveal">
+            <div class="flip-inner">
+              <!-- Front -->
+              <div class="flip-front">
+                <div class="flip-orb-area">
+                  <div class="flip-orb-ring" style="animation-delay:0s"></div>
+                  <div class="flip-orb-ring" style="animation-delay:0.3s"></div>
+                  <div class="flip-orb-ring" style="animation-delay:0.6s"></div>
+                  <div class="flip-orb-ring" style="animation-delay:0.9s"></div>
+                  <div class="flip-orb-ring" style="animation-delay:1.2s"></div>
+                  <div class="flip-orb-ring" style="animation-delay:1.5s"></div>
+                  <!-- Central icon -->
+                  <iconify-icon icon="lucide:hand" class="text-orange-400/40 text-4xl relative z-10"></iconify-icon>
+                </div>
+                <div class="flip-front-foot">
+                  <div>
+                    <div class="flip-title">Sign Recognition</div>
+                    <div class="flip-subtitle">Hover to explore</div>
+                  </div>
+                  <div class="flip-repeat-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                      <path d="M17 1l4 4-4 4" />
+                      <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                      <path d="M7 23l-4-4 4-4" />
+                      <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <!-- Back -->
+              <div class="flip-back">
+                <div class="flip-back-title">Sign Recognition</div>
+                <div class="flip-back-desc">Necho's neural core reads gestures in real-time with 99% accuracy — no
+                  special hardware needed.</div>
+                <div class="flip-feature" style="transition-delay:200ms">
+                  <svg class="flip-arrow-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                  <span>Under 80ms inference</span>
+                </div>
+                <div class="flip-feature" style="transition-delay:300ms">
+                  <svg class="flip-arrow-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                  <span>Camera-only, no sensors</span>
+                </div>
+                <div class="flip-feature" style="transition-delay:400ms">
+                  <svg class="flip-arrow-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                  <span>40+ regional dialects</span>
+                </div>
+                <div class="flip-back-cta">
+                  <a href="interpreter.html" class="flip-cta-row">
+                    <span class="flip-cta-label">Try it now</span>
+                    <svg class="flip-cta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Card 2: Real-Time Translation ── -->
+          <div class="flip-scene reveal" style="transition-delay:100ms">
+            <div class="flip-inner">
+              <div class="flip-front">
+                <div class="flip-orb-area">
+                  <div class="flip-orb-ring" style="animation-delay:0.15s"></div>
+                  <div class="flip-orb-ring" style="animation-delay:0.45s"></div>
+                  <div class="flip-orb-ring" style="animation-delay:0.75s"></div>
+                  <div class="flip-orb-ring" style="animation-delay:1.05s"></div>
+                  <div class="flip-orb-ring" style="animation-delay:1.35s"></div>
+                  <div class="flip-orb-ring" style="animation-delay:1.65s"></div>
+                  <iconify-icon icon="lucide:volume-2" class="text-orange-400/40 text-4xl relative z-10"></iconify-icon>
+                </div>
+                <div class="flip-front-foot">
+                  <div>
+                    <div class="flip-title">Real-Time Translation</div>
+                    <div class="flip-subtitle">Sign → Speech instantly</div>
+                  </div>
+                  <div class="flip-repeat-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                      <path d="M17 1l4 4-4 4" />
+                      <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                      <path d="M7 23l-4-4 4-4" />
+                      <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <div class="flip-back">
+                <div class="flip-back-title">Real-Time Translation</div>
+                <div class="flip-back-desc">Silence becomes speech. Text, audio, and multi-dialect support — bridging
+                  every conversation.</div>
+                <div class="flip-feature" style="transition-delay:200ms">
+                  <svg class="flip-arrow-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                  <span>Text & audio output</span>
+                </div>
+                <div class="flip-feature" style="transition-delay:300ms">
+                  <svg class="flip-arrow-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                  <span>Natural language synthesis</span>
+                </div>
+                <div class="flip-feature" style="transition-delay:400ms">
+                  <svg class="flip-arrow-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                  <span>Emotion-aware output</span>
+                </div>
+                <div class="flip-back-cta">
+                  <a href="interpreter.html" class="flip-cta-row">
+                    <span class="flip-cta-label">See it in action</span>
+                    <svg class="flip-cta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Card 3: Global Access ── -->
+          <div class="flip-scene reveal sm:col-span-2 lg:col-span-1" style="transition-delay:200ms">
+            <div class="flip-inner">
+              <div class="flip-front">
+                <div class="flip-orb-area">
+                  <div class="flip-orb-ring" style="animation-delay:0.1s"></div>
+                  <div class="flip-orb-ring" style="animation-delay:0.4s"></div>
+                  <div class="flip-orb-ring" style="animation-delay:0.7s"></div>
+                  <div class="flip-orb-ring" style="animation-delay:1.0s"></div>
+                  <div class="flip-orb-ring" style="animation-delay:1.3s"></div>
+                  <div class="flip-orb-ring" style="animation-delay:1.6s"></div>
+                  <iconify-icon icon="lucide:globe" class="text-orange-400/40 text-4xl relative z-10"></iconify-icon>
+                </div>
+                <div class="flip-front-foot">
+                  <div>
+                    <div class="flip-title">Global Access</div>
+                    <div class="flip-subtitle">Borderless communication</div>
+                  </div>
+                  <div class="flip-repeat-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                      <path d="M17 1l4 4-4 4" />
+                      <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                      <path d="M7 23l-4-4 4-4" />
+                      <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <div class="flip-back">
+                <div class="flip-back-title">Global Access</div>
+                <div class="flip-back-desc">From London to Mumbai — Necho reaches every corner of the world with zero
+                  latency barriers.</div>
+                <div class="flip-feature" style="transition-delay:200ms">
+                  <svg class="flip-arrow-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                  <span>3 global edge clusters</span>
+                </div>
+                <div class="flip-feature" style="transition-delay:300ms">
+                  <svg class="flip-arrow-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                  <span>70M+ users served</span>
+                </div>
+                <div class="flip-feature" style="transition-delay:400ms">
+                  <svg class="flip-arrow-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                  <span>Works offline too</span>
+                </div>
+                <div class="flip-back-cta">
+                  <a href="about.html" class="flip-cta-row">
+                    <span class="flip-cta-label">Our mission</span>
+                    <svg class="flip-cta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /grid -->
+
+        <!-- CTA under cards -->
+        <div class="text-center mt-20 reveal">
+          <a href="interpreter.html"
+            class="inline-flex items-center gap-3 px-8 py-4 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm text-sm font-medium text-white/70 hover:text-white hover:bg-white/10 transition-all duration-300"
+            style="border-color: rgba(232,77,28,0.2);">
+            Try the Interpreter free
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="7" y1="17" x2="17" y2="7" />
+              <polyline points="7 7 17 7 17 17" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ IMPACT ════════════════════════════════════════════════ -->
+    <section class="py-14 relative overflow-hidden bg-[#050505]" style="border-top: 1px solid rgba(232,77,28,0.1);">
+      <!-- ambient glow -->
+      <div class="absolute inset-0 pointer-events-none"
+        style="background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(232,77,28,0.07) 0%, transparent 70%);">
+      </div>
+
+      <div class="container mx-auto px-6 relative z-10">
+        <div class="reveal text-center mb-10">
+          <div class="section-label justify-center mb-4">Global Reach</div>
+          <h2 class="font-serif text-4xl md:text-6xl text-white/90">Numbers that <br /><span
+              class="italic font-light">speak volumes.</span></h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-0 max-w-5xl mx-auto">
+          <!-- Stat 1 -->
+          <div class="reveal flex flex-col items-center text-center py-12 px-8 border-r border-white/5 last:border-r-0">
+            <div class="impact-num mb-3">70M+</div>
+            <p class="text-white/50 text-sm font-medium tracking-widest uppercase">Deaf &amp; Hard-of-Hearing Users</p>
+            <p class="text-white/25 text-xs mt-2 font-light max-w-[16ch]">Reached by sign language globally</p>
+          </div>
+          <!-- Stat 2 -->
+          <div class="reveal flex flex-col items-center text-center py-12 px-8 border-r border-white/5 last:border-r-0"
+            style="transition-delay:120ms">
+            <div class="impact-num mb-3">40+</div>
+            <p class="text-white/50 text-sm font-medium tracking-widest uppercase">Sign Language Dialects</p>
+            <p class="text-white/25 text-xs mt-2 font-light max-w-[16ch]">From ASL to ISL, BSL and beyond</p>
+          </div>
+          <!-- Stat 3 -->
+          <div class="reveal flex flex-col items-center text-center py-12 px-8" style="transition-delay:240ms">
+            <div class="impact-num mb-3">&lt;80ms</div>
+            <p class="text-white/50 text-sm font-medium tracking-widest uppercase">Neural Response Time</p>
+            <p class="text-white/25 text-xs mt-2 font-light max-w-[16ch]">Faster than a blink of an eye</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ PROCESS ════════════════════════════════════════════════ -->
+    <section id="necho-journey" class="relative overflow-hidden bg-[#050200]"
+      style="border-top:1px solid rgba(255,255,255,0.04); padding:4rem 0 5rem;">
+
+      <!-- Blueprint grid background -->
+      <div class="absolute inset-0 pointer-events-none" style="
+        background-image:
+          linear-gradient(rgba(232,77,28,0.04) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(232,77,28,0.04) 1px, transparent 1px);
+        background-size: 48px 48px;
+        mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, black 30%, transparent 100%);
+      "></div>
+
+      <!-- Ambient glow -->
+      <div class="absolute inset-0 pointer-events-none"
+        style="background:radial-gradient(ellipse 70% 55% at 50% 50%, rgba(232,77,28,0.07) 0%, transparent 70%);"></div>
+
+      <style>
+        /* ─────────────────── Journey Diagram ─────────────────── */
+
+        /* Section header */
+        .njd-eyebrow {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 0.68rem;
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+          font-weight: 700;
+          color: rgba(232, 77, 28, 0.85);
+          margin-bottom: 1rem;
+        }
+
+        .njd-eyebrow::before,
+        .njd-eyebrow::after {
+          content: '';
+          display: block;
+          height: 1px;
+          width: 28px;
+          background: rgba(232, 77, 28, 0.4);
+        }
+
+        .njd-heading {
+          font-family: 'Playfair Display', serif;
+          font-size: clamp(2.4rem, 5vw, 3.8rem);
+          font-weight: 600;
+          color: rgba(255, 255, 255, 0.9);
+          letter-spacing: -0.03em;
+          line-height: 1.1;
+          margin-bottom: 1.1rem;
+        }
+
+        .njd-sub {
+          font-size: 0.92rem;
+          color: rgba(255, 255, 255, 0.28);
+          font-weight: 400;
+          max-width: 38ch;
+          margin: 0 auto;
+          line-height: 1.65;
+        }
+
+        /* ── Diagram canvas ── */
+        .njd-canvas {
+          position: relative;
+          margin-top: 5rem;
+          display: flex;
+          align-items: flex-start;
+          justify-content: center;
+          gap: 0;
+        }
+
+        /* Connectors SVG overlay (absolute, spans full canvas width) */
+        .njd-connectors {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          overflow: visible;
+          z-index: 1;
+        }
+
+        /* Bezier connector path styling */
+        .njd-path-bg {
+          fill: none;
+          stroke: rgba(255, 255, 255, 0.05);
+          stroke-width: 1.5;
+        }
+
+        .njd-path-line {
+          fill: none;
+          stroke-width: 1.5;
+          stroke-dasharray: 6 4;
+          stroke-linecap: round;
+          opacity: 0;
+          transition: opacity 0.4s ease;
+        }
+
+        .njd-path-line.live {
+          opacity: 1;
+        }
+
+        /* Animated travelling packet on path */
+        .njd-packet {
+          r: 4;
+          opacity: 0;
+          filter: drop-shadow(0 0 6px currentColor);
+        }
+
+        .njd-packet.go {
+          animation: njdPacket 2.1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+          opacity: 1;
+        }
+
+        .njd-packet-2.go {
+          animation-delay: 0.7s;
+        }
+
+        .njd-packet-3.go {
+          animation-delay: 1.4s;
+        }
+
+        @keyframes njdPacket {
+          0% {
+            opacity: 0
+          }
+
+          5% {
+            opacity: 1
+          }
+
+          90% {
+            opacity: 1
+          }
+
+          100% {
+            opacity: 0
+          }
+        }
+
+        /* ── Step Panel ── */
+        .njd-panel {
+          flex: 1;
+          min-width: 0;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          position: relative;
+          z-index: 2;
+          padding: 0 0.75rem;
+          opacity: 0;
+          transform: translateY(36px);
+          transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+            transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .njd-panel.in {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        .njd-panel:nth-child(2) {
+          transition-delay: 0.16s;
+        }
+
+        .njd-panel:nth-child(3) {
+          transition-delay: 0.32s;
+        }
+
+        /* Panel card */
+        .njd-card {
+          width: 100%;
+          max-width: 280px;
+          border-radius: 20px;
+          background: rgba(255, 255, 255, 0.025);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          overflow: hidden;
+          transition: border-color 0.45s ease, box-shadow 0.45s ease;
+          position: relative;
+        }
+
+        .njd-card:hover {
+          border-color: rgba(232, 77, 28, 0.35);
+          box-shadow: 0 0 48px rgba(232, 77, 28, 0.1), 0 0 0 1px rgba(232, 77, 28, 0.08) inset;
+        }
+
+        /* Step number badge top-left of card */
+        .njd-badge {
+          position: absolute;
+          top: 14px;
+          left: 16px;
+          z-index: 10;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .njd-badge-num {
+          font-size: 0.6rem;
+          font-weight: 800;
+          letter-spacing: 0.1em;
+          color: rgba(232, 77, 28, 0.9);
+          font-family: 'Inter', sans-serif;
+          background: rgba(232, 77, 28, 0.1);
+          border: 1px solid rgba(232, 77, 28, 0.3);
+          border-radius: 999px;
+          padding: 2px 8px;
+        }
+
+        /* ── Illustration area inside card ── */
+        .njd-viz {
+          height: 180px;
+          background: linear-gradient(to bottom, #0a0401, #050200);
+          position: relative;
+          overflow: hidden;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* ── CAMERA VIZ ── */
+        .njd-cam-frame {
+          width: 110px;
+          height: 82px;
+          border: 2px solid rgba(232, 77, 28, 0.55);
+          border-radius: 8px;
+          position: relative;
+          box-shadow: 0 0 20px rgba(232, 77, 28, 0.15);
+        }
+
+        /* Corner markers */
+        .njd-cam-frame::before,
+        .njd-cam-frame::after {
+          content: '';
+          position: absolute;
+          width: 10px;
+          height: 10px;
+        }
+
+        .njd-cam-frame::before {
+          top: -3px;
+          left: -3px;
+          border-top: 2px solid #e84d1c;
+          border-left: 2px solid #e84d1c;
+        }
+
+        .njd-cam-frame::after {
+          bottom: -3px;
+          right: -3px;
+          border-bottom: 2px solid #e84d1c;
+          border-right: 2px solid #e84d1c;
+        }
+
+        /* The scan line */
+        .njd-scanline {
+          position: absolute;
+          left: 0;
+          right: 0;
+          height: 2px;
+          background: linear-gradient(90deg, transparent, rgba(232, 77, 28, 0.9), transparent);
+          top: 0;
+          animation: njdScan 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+          box-shadow: 0 0 10px rgba(232, 77, 28, 0.6);
+        }
+
+        @keyframes njdScan {
+          0% {
+            top: 0%;
+            opacity: 0;
+          }
+
+          10% {
+            opacity: 1;
+          }
+
+          90% {
+            opacity: 1;
+          }
+
+          100% {
+            top: 100%;
+            opacity: 0;
+          }
+        }
+
+        /* Grid inside cam frame */
+        .njd-cam-grid {
+          position: absolute;
+          inset: 0;
+          opacity: 0.15;
+          background-image:
+            linear-gradient(rgba(232, 77, 28, 0.7) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(232, 77, 28, 0.7) 1px, transparent 1px);
+          background-size: 22px 22px;
+        }
+
+        /* Hand silhouette dots */
+        .njd-hand-dot {
+          position: absolute;
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+          background: rgba(232, 77, 28, 0.8);
+          box-shadow: 0 0 6px rgba(232, 77, 28, 0.6);
+          animation: njdPop 2.8s ease-in-out infinite;
+        }
+
+        @keyframes njdPop {
+
+          0%,
+          100% {
+            transform: scale(0.6);
+            opacity: 0.4;
+          }
+
+          50% {
+            transform: scale(1.1);
+            opacity: 1;
+          }
+        }
+
+        /* Rec indicator */
+        .njd-rec {
+          position: absolute;
+          bottom: 8px;
+          right: 8px;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 0.5rem;
+          font-weight: 700;
+          letter-spacing: 0.1em;
+          color: rgba(232, 77, 28, 0.7);
+          text-transform: uppercase;
+        }
+
+        .njd-rec-dot {
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+          background: #e84d1c;
+          animation: njdBlink 1s ease-in-out infinite;
+          box-shadow: 0 0 4px rgba(232, 77, 28, 0.8);
+        }
+
+        @keyframes njdBlink {
+
+          0%,
+          100% {
+            opacity: 1
+          }
+
+          50% {
+            opacity: 0.15
+          }
+        }
+
+        /* ── NEURAL NETWORK VIZ ── */
+        .njd-nn {
+          width: 100%;
+          height: 100%;
+          position: absolute;
+          inset: 0;
+        }
+
+        .njd-nn-node {
+          fill: rgba(255, 255, 255, 0.08);
+          stroke: rgba(232, 77, 28, 0.3);
+          stroke-width: 1;
+          transition: fill 0.3s, stroke 0.3s;
+        }
+
+        .njd-nn-node.fire {
+          fill: rgba(232, 77, 28, 0.35);
+          stroke: rgba(232, 77, 28, 0.85);
+          filter: drop-shadow(0 0 6px rgba(232, 77, 28, 0.7));
+        }
+
+        .njd-nn-edge {
+          stroke: rgba(255, 255, 255, 0.06);
+          stroke-width: 1;
+          fill: none;
+          stroke-dasharray: 40;
+          stroke-dashoffset: 40;
+          transition: stroke-dashoffset 0.5s ease, stroke 0.4s ease;
+        }
+
+        .njd-nn-edge.pulse {
+          stroke: rgba(245, 158, 11, 0.5);
+          stroke-dashoffset: 0;
+        }
+
+        /* ── WAVEFORM VIZ ── */
+        .njd-wave-bars {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          height: 60px;
+        }
+
+        .njd-bar {
+          width: 5px;
+          border-radius: 3px;
+          background: linear-gradient(to top, #e84d1c, #f59e0b);
+          transform-origin: bottom;
+          animation: njdBar 1.2s ease-in-out infinite;
+        }
+
+        @keyframes njdBar {
+
+          0%,
+          100% {
+            transform: scaleY(0.2);
+            opacity: 0.4;
+          }
+
+          50% {
+            transform: scaleY(1);
+            opacity: 1;
+          }
+        }
+
+        /* frequency ring behind bars */
+        .njd-wave-ring {
+          position: absolute;
+          border-radius: 50%;
+          border: 1px solid rgba(232, 77, 28, 0.15);
+          animation: njdRingPulse 2.4s ease-out infinite;
+          opacity: 0;
+        }
+
+        @keyframes njdRingPulse {
+          0% {
+            transform: scale(0.5);
+            opacity: 0.8;
+          }
+
+          100% {
+            transform: scale(1.8);
+            opacity: 0;
+          }
+        }
+
+        /* ── Info area below viz ── */
+        .njd-info {
+          padding: 1.35rem 1.4rem 1.5rem;
+        }
+
+        .njd-title {
+          font-family: 'Playfair Display', serif;
+          font-size: 1.15rem;
+          font-weight: 600;
+          color: rgba(255, 255, 255, 0.87);
+          letter-spacing: -0.02em;
+          margin-bottom: 0.45rem;
+          line-height: 1.2;
+        }
+
+        .njd-desc {
+          font-size: 0.78rem;
+          color: rgba(255, 255, 255, 0.3);
+          font-weight: 400;
+          line-height: 1.65;
+        }
+
+        /* Metric chip */
+        .njd-chip {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          margin-top: 0.85rem;
+          padding: 3px 10px;
+          border-radius: 999px;
+          border: 1px solid rgba(232, 77, 28, 0.22);
+          background: rgba(232, 77, 28, 0.07);
+          font-size: 0.65rem;
+          font-weight: 700;
+          letter-spacing: 0.07em;
+          text-transform: uppercase;
+          color: rgba(232, 77, 28, 0.75);
+        }
+
+        .njd-chip-blink {
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: #e84d1c;
+          animation: njdBlink 1.4s ease-in-out infinite;
+        }
+
+        /* ── Footer strip ── */
+        .njd-footer {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 3rem;
+          margin-top: 4.5rem;
+          padding-top: 2.5rem;
+          border-top: 1px solid rgba(255, 255, 255, 0.05);
+          opacity: 0;
+          transform: translateY(18px);
+          transition: opacity 0.35s 0.5s cubic-bezier(0.22,1,0.36,1), transform 0.35s 0.5s cubic-bezier(0.22,1,0.36,1);
+        }
+
+        .njd-footer.in {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        .njd-footer-item {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 0.7rem;
+          color: rgba(255, 255, 255, 0.28);
+          font-weight: 500;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+        }
+
+        .njd-footer-item iconify-icon {
+          font-size: 0.95rem;
+          color: rgba(232, 77, 28, 0.6);
+        }
+
+        /* Mobile */
+        @media (max-width: 767px) {
+          .njd-canvas {
+            flex-direction: column;
+            align-items: center;
+            gap: 2.5rem;
+          }
+
+          .njd-connectors {
+            display: none;
+          }
+
+          .njd-panel {
+            width: 100%;
+            max-width: 320px;
+          }
+
+          .njd-footer {
+            flex-direction: column;
+            gap: 1rem;
+          }
+        }
+      </style>
+
+      <div class="container mx-auto px-6 relative z-10">
+
+        <!-- Header -->
+        <div class="text-center reveal">
+          <div class="njd-eyebrow">Your Journey</div>
+          <h2 class="njd-heading">Three steps.<br /><em style="font-style:italic;font-weight:300">One seamless
+              voice.</em></h2>
+          <p class="njd-sub">From first gesture to instant sound — a neural pipeline built for real humans.</p>
+        </div>
+
+        <!-- ═══ DIAGRAM CANVAS ═══ -->
+        <div class="njd-canvas max-w-5xl mx-auto" id="njdCanvas">
+
+          <!-- ─── SVG connectors overlay ─── -->
+          <svg class="njd-connectors" id="njdSVG" viewBox="0 0 900 280" preserveAspectRatio="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="njdG1" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#e84d1c" stop-opacity="0.7" />
+                <stop offset="100%" stop-color="#f59e0b" stop-opacity="0.9" />
+              </linearGradient>
+              <linearGradient id="njdG2" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.9" />
+                <stop offset="100%" stop-color="#e84d1c" stop-opacity="0.7" />
+              </linearGradient>
+            </defs>
+
+            <!-- Ghost baseline paths -->
+            <path d="M300,140 C360,140 390,140 450,140" class="njd-path-bg" />
+            <path d="M450,140 C510,140 540,140 600,140" class="njd-path-bg" />
+
+            <!-- Animated connector 1 → 2 -->
+            <path id="njdPath1" d="M300,140 C360,140 390,140 450,140" class="njd-path-line" stroke="url(#njdG1)" />
+            <!-- Animated connector 2 → 3 -->
+            <path id="njdPath2" d="M450,140 C510,140 540,140 600,140" class="njd-path-line" stroke="url(#njdG2)" />
+
+            <!-- Packets on path 1 -->
+            <circle class="njd-packet" fill="#e84d1c" id="pkt1a" />
+            <circle class="njd-packet njd-packet-2" fill="#f59e0b" id="pkt1b" />
+
+            <!-- Packets on path 2 -->
+            <circle class="njd-packet" fill="#f59e0b" id="pkt2a" />
+            <circle class="njd-packet njd-packet-2" fill="#e84d1c" id="pkt2b" />
+          </svg>
+
+          <!-- ─────────────────── PANEL 1 — Camera ─────────────────── -->
+          <div class="njd-panel" id="njdP1">
+            <div class="njd-card">
+              <div class="njd-badge"><span class="njd-badge-num">01</span></div>
+
+              <!-- Camera Viz -->
+              <div class="njd-viz">
+                <!-- Outer camera icon hint -->
+                <div style="position:absolute;top:12px;right:14px;opacity:0.2;">
+                  <iconify-icon icon="lucide:camera" style="font-size:1.1rem;color:#e84d1c;"></iconify-icon>
+                </div>
+                <div class="njd-cam-frame">
+                  <div class="njd-cam-grid"></div>
+                  <div class="njd-scanline"></div>
+                  <!-- hand landmark dots -->
+                  <div class="njd-hand-dot" style="left:30%;top:25%;animation-delay:0s;"></div>
+                  <div class="njd-hand-dot" style="left:45%;top:18%;animation-delay:0.3s;"></div>
+                  <div class="njd-hand-dot" style="left:60%;top:24%;animation-delay:0.6s;"></div>
+                  <div class="njd-hand-dot" style="left:55%;top:40%;animation-delay:0.9s;"></div>
+                  <div class="njd-hand-dot" style="left:40%;top:45%;animation-delay:0.15s;"></div>
+                  <div class="njd-hand-dot" style="left:35%;top:60%;animation-delay:0.45s;"></div>
+                  <div class="njd-hand-dot" style="left:50%;top:58%;animation-delay:0.75s;"></div>
+                  <div class="njd-hand-dot" style="left:65%;top:55%;animation-delay:0.2s;"></div>
+                  <!-- connecting lines between dots (SVG inside cam) -->
+                  <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:0.3;" viewBox="0 0 110 82"
+                    preserveAspectRatio="none">
+                    <polyline points="33,20 49,15 65,20 60,33 44,37 38,49 55,48 72,45" fill="none" stroke="#e84d1c"
+                      stroke-width="1" stroke-dasharray="3 2" />
+                  </svg>
+                  <div class="njd-rec">
+                    <div class="njd-rec-dot"></div>REC
+                  </div>
+                </div>
+                <!-- corner markers outside frame -->
+                <div
+                  style="position:absolute;top:14px;left:14px;width:14px;height:14px;border-top:2px solid rgba(232,77,28,0.3);border-left:2px solid rgba(232,77,28,0.3);border-radius:2px 0 0 0;">
+                </div>
+                <div
+                  style="position:absolute;top:14px;right:14px;width:14px;height:14px;border-top:2px solid rgba(232,77,28,0.3);border-right:2px solid rgba(232,77,28,0.3);border-radius:0 2px 0 0;">
+                </div>
+                <div
+                  style="position:absolute;bottom:14px;left:14px;width:14px;height:14px;border-bottom:2px solid rgba(232,77,28,0.3);border-left:2px solid rgba(232,77,28,0.3);border-radius:0 0 0 2px;">
+                </div>
+                <div
+                  style="position:absolute;bottom:14px;right:14px;width:14px;height:14px;border-bottom:2px solid rgba(232,77,28,0.3);border-right:2px solid rgba(232,77,28,0.3);border-radius:0 0 2px 0;">
+                </div>
+                <!-- status bar -->
+                <div
+                  style="position:absolute;bottom:0;left:0;right:0;padding:5px 12px;display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,0.4);font-size:0.5rem;font-family:'Inter',sans-serif;letter-spacing:0.08em;color:rgba(255,255,255,0.35);">
+                  <span>HAND_TRACK v2.1</span><span style="color:rgba(232,77,28,0.7);">■ LIVE</span>
+                </div>
+              </div>
+
+              <div class="njd-info">
+                <div class="njd-title">Open Camera</div>
+                <p class="njd-desc">Launch Necho on any device. No hardware, no install — just your browser and hands.
+                </p>
+                <div class="njd-chip">
+                  <div class="njd-chip-blink"></div>Any device
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ─────────────────── PANEL 2 — Neural ─────────────────── -->
+          <div class="njd-panel" id="njdP2">
+            <div class="njd-card">
+              <div class="njd-badge"><span class="njd-badge-num">02</span></div>
+
+              <!-- Neural Network Viz -->
+              <div class="njd-viz">
+                <svg class="njd-nn" id="njdNN" viewBox="0 0 280 180" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Layer 1 (input) -->
+                  <circle class="njd-nn-node" id="nn-i0" cx="52" cy="60" r="11" />
+                  <circle class="njd-nn-node" id="nn-i1" cx="52" cy="90" r="11" />
+                  <circle class="njd-nn-node" id="nn-i2" cx="52" cy="120" r="11" />
+                  <!-- Layer 2 (hidden 1) -->
+                  <circle class="njd-nn-node" id="nn-h0" cx="115" cy="50" r="11" />
+                  <circle class="njd-nn-node" id="nn-h1" cx="115" cy="80" r="11" />
+                  <circle class="njd-nn-node" id="nn-h2" cx="115" cy="110" r="11" />
+                  <circle class="njd-nn-node" id="nn-h3" cx="115" cy="135" r="11" />
+                  <!-- Layer 3 (hidden 2) -->
+                  <circle class="njd-nn-node" id="nn-m0" cx="178" cy="60" r="11" />
+                  <circle class="njd-nn-node" id="nn-m1" cx="178" cy="90" r="11" />
+                  <circle class="njd-nn-node" id="nn-m2" cx="178" cy="120" r="11" />
+                  <!-- Layer 4 (output) -->
+                  <circle class="njd-nn-node" id="nn-o0" cx="235" cy="75" r="11" />
+                  <circle class="njd-nn-node" id="nn-o1" cx="235" cy="105" r="11" />
+
+                  <!-- i→h edges -->
+                  <line class="njd-nn-edge" id="e-i0h0" x1="63" y1="60" x2="104" y2="50" />
+                  <line class="njd-nn-edge" id="e-i0h1" x1="63" y1="62" x2="104" y2="80" />
+                  <line class="njd-nn-edge" id="e-i1h1" x1="63" y1="90" x2="104" y2="82" />
+                  <line class="njd-nn-edge" id="e-i1h2" x1="63" y1="90" x2="104" y2="108" />
+                  <line class="njd-nn-edge" id="e-i2h2" x1="63" y1="120" x2="104" y2="112" />
+                  <line class="njd-nn-edge" id="e-i2h3" x1="63" y1="120" x2="104" y2="133" />
+
+                  <!-- h→m edges -->
+                  <line class="njd-nn-edge" id="e-h0m0" x1="126" y1="50" x2="167" y2="60" />
+                  <line class="njd-nn-edge" id="e-h1m0" x1="126" y1="80" x2="167" y2="62" />
+                  <line class="njd-nn-edge" id="e-h1m1" x1="126" y1="82" x2="167" y2="90" />
+                  <line class="njd-nn-edge" id="e-h2m1" x1="126" y1="110" x2="167" y2="92" />
+                  <line class="njd-nn-edge" id="e-h2m2" x1="126" y1="110" x2="167" y2="118" />
+                  <line class="njd-nn-edge" id="e-h3m2" x1="126" y1="135" x2="167" y2="120" />
+
+                  <!-- m→o edges -->
+                  <line class="njd-nn-edge" id="e-m0o0" x1="189" y1="60" x2="224" y2="75" />
+                  <line class="njd-nn-edge" id="e-m1o0" x1="189" y1="90" x2="224" y2="77" />
+                  <line class="njd-nn-edge" id="e-m1o1" x1="189" y1="90" x2="224" y2="103" />
+                  <line class="njd-nn-edge" id="e-m2o1" x1="189" y1="120" x2="224" y2="105" />
+
+                  <!-- Dialect labels near output -->
+                  <text x="248" y="74" font-size="6" fill="rgba(245,158,11,0.6)"
+                    font-family="Inter,sans-serif">ASL</text>
+                  <text x="248" y="109" font-size="6" fill="rgba(232,77,28,0.6)"
+                    font-family="Inter,sans-serif">ISL</text>
+
+                  <!-- Confidence bar below -->
+                  <rect x="30" y="158" width="220" height="3" rx="2" fill="rgba(255,255,255,0.05)" />
+                  <rect x="30" y="158" width="0" height="3" rx="2" fill="url(#njdG1)" id="nn-conf-bar" />
+                </svg>
+                <div
+                  style="position:absolute;bottom:0;left:0;right:0;padding:5px 12px;display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,0.4);font-size:0.5rem;font-family:'Inter',sans-serif;letter-spacing:0.08em;color:rgba(255,255,255,0.35);">
+                  <span>NEURAL_CORE v4.2</span><span id="nn-conf-label" style="color:rgba(232,77,28,0.7);">CONF
+                    0%</span>
+                </div>
+              </div>
+
+              <div class="njd-info">
+                <div class="njd-title">Sign Naturally</div>
+                <p class="njd-desc">Our neural core maps gestures against 40+ dialects simultaneously in real-time.</p>
+                <div class="njd-chip">
+                  <div class="njd-chip-blink"></div>40+ dialects
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ─────────────────── PANEL 3 — Audio ─────────────────── -->
+          <div class="njd-panel" id="njdP3">
+            <div class="njd-card">
+              <div class="njd-badge"><span class="njd-badge-num">03</span></div>
+
+              <!-- Audio Viz -->
+              <div class="njd-viz" style="flex-direction:column;gap:1rem;">
+                <!-- Pulse rings -->
+                <div class="njd-wave-ring" style="width:90px;height:90px;animation-delay:0s;"></div>
+                <div class="njd-wave-ring" style="width:90px;height:90px;animation-delay:0.8s;"></div>
+                <div class="njd-wave-ring" style="width:90px;height:90px;animation-delay:1.6s;"></div>
+                <!-- Speaker icon -->
+                <div
+                  style="position:relative;z-index:2;width:36px;height:36px;border-radius:50%;background:rgba(232,77,28,0.12);border:1px solid rgba(232,77,28,0.4);display:flex;align-items:center;justify-content:center;">
+                  <iconify-icon icon="lucide:volume-2"
+                    style="font-size:1.1rem;color:rgba(232,77,28,0.85);"></iconify-icon>
+                </div>
+                <!-- Waveform bars -->
+                <div class="njd-wave-bars" style="position:relative;z-index:2;">
+                  <div class="njd-bar" style="height:40px;animation-delay:0s;"></div>
+                  <div class="njd-bar" style="height:55px;animation-delay:0.1s;"></div>
+                  <div class="njd-bar" style="height:35px;animation-delay:0.2s;"></div>
+                  <div class="njd-bar" style="height:60px;animation-delay:0.05s;"></div>
+                  <div class="njd-bar" style="height:48px;animation-delay:0.15s;"></div>
+                  <div class="njd-bar" style="height:30px;animation-delay:0.25s;"></div>
+                  <div class="njd-bar" style="height:52px;animation-delay:0.08s;"></div>
+                  <div class="njd-bar" style="height:42px;animation-delay:0.18s;"></div>
+                  <div class="njd-bar" style="height:36px;animation-delay:0.3s;"></div>
+                </div>
+                <!-- Transcription ticker -->
+                <div id="njd-ticker"
+                  style="position:absolute;bottom:0;left:0;right:0;padding:5px 12px;background:rgba(0,0,0,0.4);font-size:0.5rem;font-family:'Inter',sans-serif;letter-spacing:0.06em;display:flex;justify-content:space-between;align-items:center;color:rgba(255,255,255,0.35);">
+                  <span id="njd-ticker-text">"Hello, how are you?"</span>
+                  <span style="color:rgba(232,77,28,0.7);">⏱ 72ms</span>
+                </div>
+              </div>
+
+              <div class="njd-info">
+                <div class="njd-title">Hear the Words</div>
+                <p class="njd-desc">Silence becomes spoken language. Text, audio, dialect bridging — all in under 80ms.
+                </p>
+                <div class="njd-chip">
+                  <div class="njd-chip-blink"></div>&lt;80 ms
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /njd-canvas -->
+
+        <!-- Footer strip -->
+        <div class="njd-footer" id="njdFooter">
+          <div class="njd-footer-item">
+            <iconify-icon icon="lucide:zap"></iconify-icon>
+            Real-time inference
+          </div>
+          <div class="njd-footer-item">
+            <iconify-icon icon="lucide:shield"></iconify-icon>
+            Privacy first
+          </div>
+          <div class="njd-footer-item">
+            <iconify-icon icon="lucide:globe"></iconify-icon>
+            Works everywhere
+          </div>
+        </div>
+
+      </div><!-- /container -->
+
+      <script>
+        (function () {
+          var section = document.getElementById('necho-journey');
+          var panels = section.querySelectorAll('.njd-panel');
+          var path1 = document.getElementById('njdPath1');
+          var path2 = document.getElementById('njdPath2');
+          var footer = document.getElementById('njdFooter');
+          var fired = false;
+
+          /* ── Neural net firing sequence ── */
+          var NLayerSeq = [
+            ['nn-i0', 'nn-i1', 'nn-i2'],
+            ['e-i0h0', 'e-i0h1', 'e-i1h1', 'e-i1h2', 'e-i2h2', 'e-i2h3'],
+            ['nn-h0', 'nn-h1', 'nn-h2', 'nn-h3'],
+            ['e-h0m0', 'e-h1m0', 'e-h1m1', 'e-h2m1', 'e-h2m2', 'e-h3m2'],
+            ['nn-m0', 'nn-m1', 'nn-m2'],
+            ['e-m0o0', 'e-m1o0', 'e-m1o1', 'e-m2o1'],
+            ['nn-o0', 'nn-o1']
+          ];
+          function fireNN() {
+            var delay = 0;
+            NLayerSeq.forEach(function (group) {
+              delay += 200;
+              setTimeout(function () {
+                group.forEach(function (id) {
+                  var el = document.getElementById(id);
+                  if (el) el.classList.add(el.tagName === 'circle' ? 'fire' : 'pulse');
+                });
+              }, delay);
+            });
+            // confidence bar fill
+            var bar = document.getElementById('nn-conf-bar');
+            var lbl = document.getElementById('nn-conf-label');
+            if (bar) {
+              var start = Date.now(), dur = 1600, targetW = 220;
+              requestAnimationFrame(function tick() {
+                var t = Math.min((Date.now() - start) / dur, 1);
+                var ease = 1 - Math.pow(1 - t, 3);
+                bar.setAttribute('width', (targetW * ease).toFixed(1));
+                if (lbl) lbl.textContent = 'CONF ' + Math.round(ease * 99) + '%';
+                if (t < 1) requestAnimationFrame(tick);
+              });
+            }
+            // Repeat nn fire every 4s
+            setTimeout(fireNN, 4000);
+          }
+
+          /* ── Ticking transcript text ── */
+          var phrases = ['"Hello, how are you?"', '"Thank you very much."', '"I need some help."', '"Nice to meet you."'];
+          var pi = 0;
+          function tickPhrase() {
+            pi = (pi + 1) % phrases.length;
+            var el = document.getElementById('njd-ticker-text');
+            if (el) {
+              el.style.opacity = '0';
+              setTimeout(function () { el.textContent = phrases[pi]; el.style.opacity = '1'; }, 300);
+            }
+          }
+
+          /* ── Animate connector packets along SVG paths ── */
+          function animatePackets(pathEl, pktA, pktB) {
+            if (!pathEl || !pktA) return;
+            var len = pathEl.getTotalLength ? pathEl.getTotalLength() : 150;
+            var dur = 1800;
+            var ids = [pktA, pktB];
+            ids.forEach(function (id, idx) {
+              var pt = document.getElementById(id);
+              if (!pt) return;
+              var offset = idx * (dur / 2);
+              var startTime = null;
+              function step(ts) {
+                if (!startTime) startTime = ts + offset;
+                var t = ((ts - startTime) % dur) / dur;
+                if (t < 0) { requestAnimationFrame(step); return; }
+                var pos = pathEl.getPointAtLength ? pathEl.getPointAtLength(t * len) : { x: 0, y: 0 };
+                pt.setAttribute('cx', pos.x);
+                pt.setAttribute('cy', pos.y);
+                pt.style.opacity = (t > 0.05 && t < 0.95) ? '1' : '0';
+                requestAnimationFrame(step);
+              }
+              requestAnimationFrame(step);
+            });
+          }
+
+          var obs = new IntersectionObserver(function (entries) {
+            entries.forEach(function (e) {
+              if (e.isIntersecting && !fired) {
+                fired = true;
+
+                // Stagger panels in
+                panels.forEach(function (p, i) {
+                  setTimeout(function () { p.classList.add('in'); }, i * 90);
+                });
+
+                // Draw connector lines
+                setTimeout(function () {
+                  if (path1) path1.classList.add('live');
+                  if (path2) path2.classList.add('live');
+                }, 350);
+
+                // Start packets
+                setTimeout(function () {
+                  animatePackets(path1, 'pkt1a', 'pkt1b');
+                  animatePackets(path2, 'pkt2a', 'pkt2b');
+                }, 700);
+
+                // Neural net fire
+                setTimeout(fireNN, 500);
+
+                // Transcript ticker
+                setInterval(tickPhrase, 3200);
+
+                // Footer
+                setTimeout(function () {
+                  if (footer) footer.classList.add('in');
+                }, 900);
+              }
+            });
+          }, { threshold: 0.1 });
+
+          obs.observe(section);
+        })();
+      </script>
+
+    </section>
+
+    <!-- ══ TESTIMONIALS SLIDER ════════════════════════════════════ -->
+    <section class="py-16 relative bg-[#050505]" style="border-top: 1px solid rgba(255,255,255,0.04);">
+      <style>
+        /* ── Testimonial Carousel ───────────────────────────────── */
+        .tc-wrap {
+          position: relative;
+          overflow: hidden;
+          max-width: 780px;
+          margin: 0 auto;
+        }
+
+        .tc-track {
+          display: flex;
+          transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+          will-change: transform;
+        }
+
+        .tc-slide {
+          flex: 0 0 100%;
+          width: 100%;
+          padding: 0 4px;
+          box-sizing: border-box;
+        }
+
+        .tc-card {
+          background: rgba(255,255,255,0.025);
+          border: 1px solid rgba(255,255,255,0.07);
+          border-radius: 1.5rem;
+          padding: 2.5rem 2.75rem;
+          display: flex;
+          flex-direction: column;
+          gap: 1.25rem;
+          position: relative;
+          overflow: hidden;
+          transition: border-color 0.4s;
+        }
+
+        .tc-card::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          background: linear-gradient(135deg, rgba(232,77,28,0.06) 0%, transparent 60%);
+          pointer-events: none;
+        }
+
+        .tc-quote {
+          font-family: 'Playfair Display', serif;
+          font-size: 4rem;
+          line-height: 1;
+          background: linear-gradient(135deg, #e84d1c, #f59e0b);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          margin-bottom: -1rem;
+          display: block;
+        }
+
+        .tc-text {
+          font-size: 1.05rem;
+          color: rgba(255,255,255,0.65);
+          font-weight: 300;
+          line-height: 1.7;
+          font-style: italic;
+        }
+
+        .tc-author {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding-top: 1.25rem;
+          border-top: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .tc-avatar {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 13px;
+          font-weight: 700;
+          color: white;
+          flex-shrink: 0;
+          background: linear-gradient(135deg, #e84d1c, #f59e0b);
+        }
+
+        .tc-name   { font-size: 0.875rem; font-weight: 600; color: rgba(255,255,255,0.85); }
+        .tc-meta   { font-size: 0.7rem;   color: rgba(255,255,255,0.3); margin-top: 1px; }
+
+        /* Dots */
+        .tc-dots {
+          display: flex;
+          justify-content: center;
+          gap: 8px;
+          margin-top: 2rem;
+        }
+
+        .tc-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 3px;
+          background: rgba(255,255,255,0.15);
+          border: none;
+          padding: 0;
+          cursor: pointer;
+          transition: width 0.35s cubic-bezier(0.22,1,0.36,1), background 0.35s;
+        }
+
+        .tc-dot.active {
+          width: 24px;
+          background: linear-gradient(to right, #e84d1c, #f59e0b);
+        }
+
+        /* Prev / Next arrows */
+        .tc-arrow {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          border: 1px solid rgba(255,255,255,0.1);
+          background: rgba(255,255,255,0.04);
+          color: rgba(255,255,255,0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: border-color 0.3s, color 0.3s, background 0.3s;
+          z-index: 10;
+        }
+
+        .tc-arrow:hover {
+          border-color: rgba(232,77,28,0.5);
+          color: #f59e0b;
+          background: rgba(232,77,28,0.08);
+        }
+
+        .tc-arrow.prev { left: -56px; }
+        .tc-arrow.next { right: -56px; }
+
+        @media (max-width: 900px) {
+          .tc-arrow { display: none; }
+        }
+      </style>
+
+      <div class="container mx-auto px-6">
+        <div class="reveal text-center mb-10">
+          <div class="section-label justify-center mb-4">Voices of Change</div>
+          <h2 class="font-serif text-4xl md:text-5xl text-white/90">What the community says.</h2>
+        </div>
+
+        <!-- Carousel wrapper (relative so arrows can be positioned) -->
+        <div style="position:relative; max-width:780px; margin:0 auto;">
+
+          <!-- Arrow: prev -->
+          <button class="tc-arrow prev" id="tc-prev" aria-label="Previous">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+          </button>
+
+          <!-- Track -->
+          <div class="tc-wrap">
+            <div class="tc-track" id="tc-track">
+
+              <!-- Slide 1 -->
+              <div class="tc-slide">
+                <div class="tc-card">
+                  <span class="tc-quote">&ldquo;</span>
+                  <p class="tc-text">Necho changed the way I interact with my colleagues. I no longer need an interpreter for every meeting — it just works, instantly.</p>
+                  <div class="tc-author">
+                    <div class="tc-avatar">A</div>
+                    <div>
+                      <p class="tc-name">Aaria S.</p>
+                      <p class="tc-meta">ASL User, San Francisco</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Slide 2 -->
+              <div class="tc-slide">
+                <div class="tc-card">
+                  <span class="tc-quote">&ldquo;</span>
+                  <p class="tc-text">The ISL dialect support is extraordinary. The accuracy is genuinely remarkable even for regional hand variations I've never seen software handle before.</p>
+                  <div class="tc-author">
+                    <div class="tc-avatar">R</div>
+                    <div>
+                      <p class="tc-name">Rahul M.</p>
+                      <p class="tc-meta">ISL Educator, Mumbai</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Slide 3 -->
+              <div class="tc-slide">
+                <div class="tc-card">
+                  <span class="tc-quote">&ldquo;</span>
+                  <p class="tc-text">As a BSL interpreter myself, I find Necho's neural approach humbling. It captures nuance that technology simply has not managed before. Truly brilliant.</p>
+                  <div class="tc-author">
+                    <div class="tc-avatar">E</div>
+                    <div>
+                      <p class="tc-name">Eleanor K.</p>
+                      <p class="tc-meta">BSL Interpreter, London</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Slide 4 -->
+              <div class="tc-slide">
+                <div class="tc-card">
+                  <span class="tc-quote">&ldquo;</span>
+                  <p class="tc-text">As a teacher, watching my deaf students finally communicate effortlessly with hearing peers using Necho — that is what technology should be for. Life-changing.</p>
+                  <div class="tc-author">
+                    <div class="tc-avatar">M</div>
+                    <div>
+                      <p class="tc-name">Meena P.</p>
+                      <p class="tc-meta">Special Education Teacher, Bangalore</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Slide 5 -->
+              <div class="tc-slide">
+                <div class="tc-card">
+                  <span class="tc-quote">&ldquo;</span>
+                  <p class="tc-text">The response latency is sub-80ms — I've clocked it. For a neural translation system handling 40+ dialects, that is an engineering feat I genuinely respect.</p>
+                  <div class="tc-author">
+                    <div class="tc-avatar">J</div>
+                    <div>
+                      <p class="tc-name">James T.</p>
+                      <p class="tc-meta">ML Engineer, London</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div><!-- /tc-track -->
+          </div><!-- /tc-wrap -->
+
+          <!-- Arrow: next -->
+          <button class="tc-arrow next" id="tc-next" aria-label="Next">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </button>
+
+        </div>
+
+        <!-- Dots -->
+        <div class="tc-dots" id="tc-dots"></div>
+      </div>
+
+      <script>
+        (function () {
+          var track   = document.getElementById('tc-track');
+          var dotsEl  = document.getElementById('tc-dots');
+          var prevBtn = document.getElementById('tc-prev');
+          var nextBtn = document.getElementById('tc-next');
+          var slides  = track.querySelectorAll('.tc-slide');
+          var total   = slides.length;
+          var current = 0;
+          var timer   = null;
+          var INTERVAL = 4200;
+
+          /* ── Build dots ── */
+          slides.forEach(function (_, i) {
+            var d = document.createElement('button');
+            d.className = 'tc-dot' + (i === 0 ? ' active' : '');
+            d.setAttribute('aria-label', 'Slide ' + (i + 1));
+            d.addEventListener('click', function () { go(i); restart(); });
+            dotsEl.appendChild(d);
+          });
+
+          function updateDots() {
+            dotsEl.querySelectorAll('.tc-dot').forEach(function (d, i) {
+              d.classList.toggle('active', i === current);
+            });
+          }
+
+          function go(idx) {
+            current = (idx + total) % total;
+            track.style.transform = 'translate3d(-' + (current * 100) + '%,0,0)';
+            updateDots();
+          }
+
+          function next() { go(current + 1); }
+          function prev() { go(current - 1); }
+
+          function restart() {
+            clearInterval(timer);
+            timer = setInterval(next, INTERVAL);
+          }
+
+          prevBtn.addEventListener('click', function () { prev(); restart(); });
+          nextBtn.addEventListener('click', function () { next(); restart(); });
+
+          /* Pause on hover */
+          var wrap = track.parentElement;
+          wrap.addEventListener('mouseenter', function () { clearInterval(timer); });
+          wrap.addEventListener('mouseleave', restart);
+
+          /* Touch / swipe */
+          var startX = 0;
+          wrap.addEventListener('touchstart', function (e) { startX = e.touches[0].clientX; }, { passive: true });
+          wrap.addEventListener('touchend', function (e) {
+            var dx = e.changedTouches[0].clientX - startX;
+            if (Math.abs(dx) > 40) { dx < 0 ? next() : prev(); restart(); }
+          }, { passive: true });
+
+          restart();
+        })();
+      </script>
+    </section>
+
+<!-- ══ FAQ ════════════════════════════════════════════════════ -->
+<section class="py-14 relative bg-[#050505]" style="border-top: 1px solid rgba(255,255,255,0.05);">
+    <div class="container mx-auto px-6">
+        <div class="max-w-2xl mx-auto text-center mb-16 reveal">
+            <div class="section-label mb-4">Knowledge Base</div>
+            <h2 class="font-serif text-3xl md:text-5xl text-white/90">Everything you need to know about Necho.</h2>
+        </div>
+        <div class="faq-list max-w-2xl mx-auto">
+            <div class="faq-item">
+                <button
+                    class="faq-q w-full flex justify-between items-center gap-4 text-left py-6 font-medium text-base"
+                    onclick="toggleFaq(this)">
+                    What is bridging communication?
+                    <svg class="faq-chevron" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        viewBox="0 0 24 24">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </button>
+                <div class="faq-a">Bridging communication is the act of facilitating a meaningful exchange between
+                    people
+                    who do not share the same language or medium of expression. At Necho, we bridge communication by
+                    using AI
+                    to translate complex sign language into spoken text instantly.</div>
+            </div>
+            <div class="faq-item">
+                <button
+                    class="faq-q w-full flex justify-between items-center gap-4 text-left py-6 font-medium text-base"
+                    onclick="toggleFaq(this)">
+                    How does Necho AI bridge silence?
+                    <svg class="faq-chevron" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        viewBox="0 0 24 24">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </button>
+                <div class="faq-a">Necho bridges silence by giving users a real-time voice. Using a simple camera feed,
+                    our
+                    AI recognizes ASL and regional sign dialects, converting them to audio so hearing individuals can
+                    participate in the conversation without needing a human interpreter.</div>
+            </div>
+            <div class="faq-item">
+                <button
+                    class="faq-q w-full flex justify-between items-center gap-4 text-left py-6 font-medium text-base"
+                    onclick="toggleFaq(this)">
+                    Why is silence so powerful in communication?
+                    <svg class="faq-chevron" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        viewBox="0 0 24 24">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </button>
+                <div class="faq-a">Silence is a fundamental part of the sign language experience. By &ldquo;Bridging
+                    Silence,&rdquo;
+                    Necho doesn't replace the beauty of sign language; it connects that world to the hearing world,
+                    ensuring
+                    that silence is a choice, not a barrier.</div>
+            </div>
+            <div class="faq-item">
+                <button
+                    class="faq-q w-full flex justify-between items-center gap-4 text-left py-6 font-medium text-base"
+                    onclick="toggleFaq(this)">
+                    How is technology bridging communication barriers today?
+                    <svg class="faq-chevron" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        viewBox="0 0 24 24">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </button>
+                <div class="faq-a">Modern technology bridges barriers through advanced machine learning. Necho
+                    specifically
+                    utilizes computer vision and neural networks to process thousands of gesture variations per second,
+                    ensuring high accuracy and local dialect recognition.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+    <!-- Big watermark text -->
+ <!--   <div class="overflow-hidden mb-12 -mx-4 select-none pointer-events-none">
+        <h2 class="text-[12vw] leading-[0.85] tracking-tighter text-white/[0.04] font-bold whitespace-nowrap">
+            NECHO.
+        </h2>
+    </div>
+-->    
+
+    <div class="footer-grid">
+        <div>
+            <img src="logo.svg" alt="Necho" class="footer-logo-img" />
+            <p class="footer-desc">Universal communication through neural interpretation and inclusive design on a
+                global
+                scale.</p>
+        </div>
+        <div>
+            <div class="footer-col-h">Platform</div>
+            <div class="footer-lnks">
+                <a class="footer-lnk" href="interpreter.html">Interpreter</a>
+                <a class="footer-lnk" href="blog.html">Blog &amp; Insights</a>
+            </div>
+        </div>
+        <div>
+            <div class="footer-col-h">Company</div>
+            <div class="footer-lnks">
+                <a class="footer-lnk" href="about.html">About Us</a>
+                <a class="footer-lnk" href="privacy.html">Privacy Policy</a>
+                <a class="footer-lnk" href="terms.html">Terms of Service</a>
+            </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-start;gap:1rem;">
+            <button id="footer-admin-btn" class="footer-admin" onclick="activateAdmin()">
+                <div class="footer-admin-dot pulse"></div>Administrative Portal
+            </button>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2026 NECHO. ALL RIGHTS RESERVED.</p>
+        <div class="footer-cities"><span>CHENNAI</span> <!--<span>SAN FRANCISCO</span><span>MUMBAI</span></div>!-->
+    </div>
+</footer>
+
+<!-- ===== THEME BTN ===== -->
+<button id="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+    <svg id="icon-sun" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="4" />
+        <line x1="12" y1="2" x2="12" y2="4" />
+        <line x1="12" y1="20" x2="12" y2="22" />
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+        <line x1="2" y1="12" x2="4" y2="12" />
+        <line x1="20" y1="12" x2="22" y2="12" />
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+    </svg>
+    <svg id="icon-moon" style="display:none" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"
+        viewBox="0 0 24 24">
+        <path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+    </svg>
+</button>
+
+<!-- Necho shared logic (auth, theme, language, accessibility, mobile menu) -->
+<script src="nav.js"></script>
+<script src="home.js"></script>
+
+<!-- Superdesign-style page animations -->
+<script>
+    // 1. Reveal on scroll (IntersectionObserver - no scroll penalty)
+    const revealObs = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('active'); revealObs.unobserve(e.target); } });
+    }, { threshold: 0.04, rootMargin: '0px 0px 0px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+    // 2. Single rAF-based scroll loop (no jank)
+    const navEl = document.getElementById('nav');
+    const heroWrapper = document.getElementById('hero-content-wrapper');
+    const handLeft = document.getElementById('hand-left-wrap');
+    const handRight = document.getElementById('hand-right-wrap');
+    const heroSection = document.querySelector('section');
+    const heroH = heroSection ? heroSection.offsetHeight : window.innerHeight;
+
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+
+    function onScrollFrame() {
+        const s = lastScrollY;
+
+        // Navbar glass
+        navEl.classList.toggle('scrolled', s > 60);
+
+        // Parallax cards (only when in viewport range)
+        if (s < heroH + 600) {
+            document.querySelectorAll('.parallax-card-up').forEach(el => {
+                el.style.setProperty('--scroll-offset-up', `${s * -0.04}px`);
+            });
+            document.querySelectorAll('.parallax-card-down').forEach(el => {
+                el.style.setProperty('--scroll-offset-down', `${s * 0.04}px`);
+            });
+        }
+
+        // Hero content parallax fade (smooth, reduced multiplier)
+        if (heroWrapper && s < heroH) {
+            const progress = Math.min(s / heroH, 1);
+            heroWrapper.style.transform = `translateY(${s * 0.18}px)`;
+            heroWrapper.style.opacity = Math.max(0, 1 - progress * 1.3).toFixed(3);
+        }
+
+        // Hands converge as user scrolls into hero
+        if (handLeft && handRight && s < heroH) {
+            const progress = Math.min(s / heroH, 1);
+            // ease-out cubic
+            const ease = 1 - Math.pow(1 - progress, 3);
+            const converge = ease * 14; // max 14vw shift toward center
+            handLeft.style.transform = `translateX(${converge}vw)`;
+            handRight.style.transform = `translateX(${-converge}vw)`;
+        } else if (handLeft && handRight && s >= heroH) {
+            handLeft.style.transform = 'translate3d(14vw,0,0)';
+            handRight.style.transform = 'translate3d(-14vw,0,0)';
+        }
+
+        ticking = false;
+    }
+
+    window.addEventListener('scroll', () => {
+        lastScrollY = window.scrollY;
+        if (!ticking) {
+            requestAnimationFrame(onScrollFrame);
+            ticking = true;
+        }
+    }, { passive: true });
+
+    // 3. Live clock
+    function updateTime() {
+        const el = document.getElementById('current-time');
+        if (!el) return;
+        const now = new Date();
+        let h = now.getHours(), m = now.getMinutes().toString().padStart(2, '0');
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        h = h % 12 || 12;
+        el.textContent = `${h}:${m} ${ampm}`;
+    }
+    setInterval(updateTime, 60000);
+    updateTime();
+</script>
+</body>
+
+</html>

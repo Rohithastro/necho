@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Interpreter — Necho</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="interpreter.css"/>
+  <style>
+    /* ── Chat messages ─────────────────────────────────────────── */
+    .chat-msg {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 11px 14px;
+      margin-bottom: 8px;
+      animation: msgIn .2s ease;
+    }
+    @keyframes msgIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: none; }
+    }
+    .msg-header { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; overflow: hidden; }
+    .msg-tag {
+      font-size: 10px; font-weight: 700; padding: 2px 8px;
+      border-radius: 5px; text-transform: uppercase;
+      letter-spacing: .45px; white-space: nowrap; flex-shrink: 0;
+    }
+    .msg-tag-gesture { background: rgba(232,77,28,.12);  color: var(--accent);   border: 1px solid rgba(232,77,28,.22); }
+    .msg-tag-voice   { background: rgba(245,158,11,.12); color: var(--accent-2); border: 1px solid rgba(245,158,11,.22); }
+    .msg-tag-text    { background: rgba(255,140,66,.12);  color: var(--accent-3); border: 1px solid rgba(255,140,66,.22); }
+    .msg-time        { margin-left: auto; font-size: 10px; opacity: .45; font-family: monospace; white-space: nowrap; padding-left: 6px; }
+    .msg-body        { font-size: 14px; line-height: 1.55; word-break: break-word; }
+    .msg-footer      { display: flex; align-items: center; gap: 7px; margin-top: 5px; }
+    .msg-meta        { font-size: 11px; opacity: .4; font-family: monospace; }
+    .msg-auto-badge  { font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 4px; background: rgba(255,255,255,.07); letter-spacing: .5px; text-transform: uppercase; }
+
+    /* ── Live transcript bubble ────────────────────────────────── */
+    .live-transcript {
+      display: flex; align-items: center; gap: 9px;
+      padding: 9px 13px; border-radius: 10px;
+      background: rgba(245,158,11,.08); border: 1px dashed rgba(245,158,11,.3);
+      margin-bottom: 8px; font-size: 13px; color: var(--accent-2); font-style: italic;
+    }
+    .lt-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-2); flex-shrink: 0; animation: blink 1s infinite; }
+    @keyframes blink { 0%,100%{ opacity:1; } 50%{ opacity:.25; } }
+
+    /* ── Clear button ──────────────────────────────────────────── */
+    .btn-clear {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 6px 12px; border-radius: 8px; font-size: 12px;
+      font-weight: 600; font-family: inherit; cursor: pointer;
+      background: transparent; border: 1px solid var(--border);
+      color: var(--muted); transition: all .18s ease;
+    }
+    .btn-clear:hover { border-color: var(--accent); color: var(--accent); background: rgba(232,77,28,.07); }
+
+    /* ── Video box + offline overlay ───────────────────────────── */
+    .video-box { position: relative; }
+    .video-offline {
+      position: absolute; inset: 0; display: none;
+      flex-direction: column; align-items: center; justify-content: center;
+      gap: 12px; background: rgba(5,5,5,.9);
+      color: var(--muted); text-align: center;
+      font-size: 14px; border-radius: inherit;
+    }
+    .video-offline code { font-family: monospace; background: rgba(255,255,255,.07); padding: 2px 8px; border-radius: 5px; font-size: 12px; }
+
+    /* ── Panel head ────────────────────────────────────────────── */
+    .panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 8px; }
+
+    /* ── Toast animation ───────────────────────────────────────── */
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+      to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    /* ── Session modal ─────────────────────────────────────────── */
+    .session-overlay {
+      position: fixed; inset: 0; z-index: 9999;
+      background: rgba(5,5,5,0.92); backdrop-filter: blur(16px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 1.5rem;
+    }
+    .session-modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 1.5rem; padding: 2.5rem 2.5rem;
+      width: 100%; max-width: 500px;
+      display: flex; flex-direction: column; gap: 1.75rem;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    }
+    .session-modal-header { display: flex; flex-direction: column; gap: 0.5rem; }
+    .session-modal h2 {
+      font-size: 1.5rem; font-weight: 800; color: var(--text);
+      letter-spacing: -0.02em; line-height: 1.2;
+    }
+    .session-modal p {
+      font-size: 0.95rem; color: var(--muted); line-height: 1.5;
+    }
+    .session-field { display: flex; flex-direction: column; gap: 8px; }
+    .session-label {
+      font-size: 11px; font-weight: 900; text-transform: uppercase;
+      letter-spacing: 0.15em; color: var(--muted);
+    }
+    .session-input {
+      background: var(--bg); border: 2px solid var(--border);
+      border-radius: 10px; padding: 13px 16px;
+      color: var(--text); font-size: 1rem; font-weight: 600;
+      outline: none; font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    .session-input:focus { border-color: var(--accent); }
+    .session-start {
+      width: 100%; padding: 1.1rem; border-radius: 12px;
+      background: linear-gradient(135deg, #e84d1c, #f59e0b);
+      color: white; font-size: 15px; font-weight: 700;
+      letter-spacing: 0.06em; font-family: inherit;
+      cursor: pointer; border: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .session-start:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    /* ── Connection badge states ────────────────────────────────── */
+    .live-badge.badge-connecting {
+      background: rgba(239,68,68,0.1) !important;
+      border-color: rgba(239,68,68,0.25) !important;
+      color: #ef4444 !important;
+    }
+    .live-badge.badge-connecting .dot-live { background: #ef4444 !important; }
+    .live-badge.badge-online {
+      background: rgba(34,197,94,0.1) !important;
+      border-color: rgba(34,197,94,0.2) !important;
+      color: #22c55e !important;
+    }
+    .live-badge.badge-online .dot-live { background: #22c55e !important; }
+  </style>
+</head>
+<body data-page="interpreter">
+
+<!-- ===== SESSION SETUP MODAL ===== -->
+<div id="session-overlay" class="session-overlay">
+  <div class="session-modal">
+    <div class="session-modal-header">
+      <h2>Start Interpreter Session</h2>
+      <p>Enter both participants' names before beginning.</p>
+    </div>
+    <div class="session-field">
+      <label class="session-label" for="speaker-name-input">Speaker (Normal Person)</label>
+      <input id="speaker-name-input" class="session-input" type="text"
+        placeholder="e.g. Rahul" autocomplete="off"
+        onkeydown="if(event.key==='Enter')document.getElementById('disabled-name-input').focus()"/>
+    </div>
+    <div class="session-field">
+      <label class="session-label" for="disabled-name-input">Deaf / Hard-of-Hearing Person</label>
+      <input id="disabled-name-input" class="session-input" type="text"
+        placeholder="e.g. Priya" autocomplete="off"
+        onkeydown="if(event.key==='Enter')startSession()"/>
+    </div>
+    <button class="session-start" onclick="startSession()">Begin Conversation →</button>
+  </div>
+</div>
+
+<!-- ===== NAV ===== -->
+<nav id="nav">
+  <div class="nav-inner">
+    <a class="nav-logo" href="index.html">
+      <img class="nav-logo-img" src="logo.svg" alt="Necho" style="height:38px;" />
+    </a>
+    <div class="nav-links">
+      <a class="nav-link"        data-page="home"        href="index.html">Home</a>
+      <a class="nav-link active" data-page="interpreter" href="interpreter.html">Interpreter</a>
+      <a class="nav-link"        data-page="about"       href="about.html">About Us</a>
+      <a class="nav-link"        data-page="blog"        href="blog.html">Blog</a>
+    </div>
+    <div class="nav-actions">
+      <div class="lang-wrap">
+        <div class="lang-btn">
+          <span id="lang-label">ENGLISH</span>
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <select id="lang-select" class="lang-select" onchange="changeLanguage(this.value)">
+          <option value="en">English</option>
+          <option value="hi">Hindi</option>
+          <option value="ta">Tamil</option>
+          <option value="te">Telugu</option>
+          <option value="kn">Kannada</option>
+          <option value="ml">Malayalam</option>
+          <option value="mr">Marathi</option>
+          <option value="gu">Gujarati</option>
+        </select>
+      </div>
+      <div class="acc-wrap">
+        <button class="acc-toggle" onclick="toggleAccPanel()" aria-label="Accessibility">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="4" r="1"/><path d="M6.2 8.5a10 10 0 0 1 11.6 0M12 6v5m0 0l-3 5m3-5l3 5"/></svg>
+        </button>
+        <div id="acc-panel" class="acc-panel">
+          <div class="acc-panel-head">
+            <span class="acc-panel-title">Inclusive Settings</span>
+            <button class="acc-x" onclick="toggleAccPanel()"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          </div>
+          <button id="acc-gray"     class="acc-opt" onclick="toggleAcc('gray')">Grayscale<div class="acc-dot"></div></button>
+          <button id="acc-contrast" class="acc-opt" onclick="toggleAcc('contrast')">High Contrast<div class="acc-dot"></div></button>
+          <button id="acc-motion"   class="acc-opt" onclick="toggleAcc('motion')">Reduced Motion<div class="acc-dot"></div></button>
+          <button id="acc-lineh"    class="acc-opt" onclick="toggleAcc('lineh')">Relaxed Spacing<div class="acc-dot"></div></button>
+          <button id="acc-wordsp"   class="acc-opt" onclick="toggleAcc('wordsp')">Word Spacing<div class="acc-dot"></div></button>
+        </div>
+      </div>
+      <a id="nav-signin"  class="nav-auth" href="signin.html">Sign In</a>
+      <button id="nav-signout" class="nav-auth" onclick="logout()" style="display:none">Sign Out</button>
+      <button class="hamburger" onclick="toggleMob()">
+        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div id="mob-menu">
+  <button class="mob-close" onclick="toggleMob()"><svg width="30" height="30" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  <a class="mob-link"        data-page="home"        href="index.html">Home</a>
+  <a class="mob-link active" data-page="interpreter" href="interpreter.html">Interpreter</a>
+  <a class="mob-link"        data-page="about"       href="about.html">About Us</a>
+  <a class="mob-link"        data-page="blog"        href="blog.html">Blog</a>
+  <a id="mob-signin"  class="mob-auth" href="signin.html">Sign In</a>
+  <button id="mob-signout" class="mob-auth" onclick="logout()" style="display:none">Sign Out</button>
+</div>
+
+<!-- ===== MAIN ===== -->
+<main class="interp-main">
+
+  <!-- ── Left: Camera + Status ── -->
+  <section class="interp-card">
+    <div class="panel-head">
+      <div class="panel-title">
+        <div class="panel-icon">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 10l4.553-2.069A1 1 0 0121 8.882v6.236a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
+        </div>
+        <h2>Camera Feed</h2>
+      </div>
+      <div class="live-badge badge-connecting" id="live-badge">
+        <div class="dot-live pulse" id="live-dot"></div>
+        <span id="live-badge-text">Connecting…</span>
+      </div>
+    </div>
+
+    <!-- Server MJPEG stream from local Flask backend -->
+    <div class="video-box">
+      <img id="video-feed" src="http://localhost:5000/video_feed" alt="Camera Feed"/>
+      <div class="video-offline" id="video-offline">
+        <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="opacity:.35"><path d="M15 10l4.553-2.069A1 1 0 0121 8.882v6.236a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
+        <p>Backend unavailable<br/><small>Run <code>testcap.py</code> to start the server</small></p>
+      </div>
+      <div class="video-cam-off" id="video-cam-off">
+        <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="opacity:.35"><path d="M15 10l4.553-2.069A1 1 0 0121 8.882v6.236a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/><line x1="2" y1="2" x2="22" y2="22" stroke-width="2"/></svg>
+        <p>Camera disabled</p>
+      </div>
+    </div>
+
+    <!-- Camera + Mic controls -->
+    <div class="cam-controls">
+      <button id="cam-btn" class="btn-cam-ctrl ctrl-on" onclick="toggleCamera()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 10l4.553-2.069A1 1 0 0121 8.882v6.236a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
+        Camera
+      </button>
+      <button id="cam-mic-btn" class="btn-cam-ctrl" onclick="toggleMic()" title="Voice input (Chrome/Edge)">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0014 0M12 19v3M9 22h6"/></svg>
+        Mic
+      </button>
+    </div>
+
+    <div class="status-panel">
+      <div class="status-row">
+        <span class="status-key">Status</span>
+        <span id="hand-status" class="status-val status-no">No Hand</span>
+      </div>
+      <div class="status-row">
+        <span class="status-key">Gesture</span>
+        <span id="gesture-val" class="status-val">—</span>
+      </div>
+      <div class="status-row">
+        <span class="status-key">Confidence</span>
+        <span id="conf-val" class="status-val">—</span>
+      </div>
+    </div>
+
+    <button id="add-gesture-btn" class="btn-red add-btn" onclick="addGesture()" disabled>
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Gesture to Chat
+    </button>
+  </section>
+
+  <!-- ── Right: Conversation ── -->
+  <section class="interp-card">
+    <div class="panel-head">
+      <div class="panel-title">
+        <div class="panel-icon">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        </div>
+        <h2>Conversation</h2>
+      </div>
+      <button class="btn-clear" onclick="clearChat()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+        Clear
+      </button>
+    </div>
+
+    <div class="chat-box" id="chat-box">
+      <div class="chat-empty" id="chat-empty">
+        <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="opacity:0.2"><path d="M7 20l-4-4V5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H7z"/></svg>
+        <p>Start gesturing or type to begin</p>
+      </div>
+    </div>
+
+    <!-- Live voice transcript bubble -->
+    <div class="live-transcript" id="live-transcript" style="display:none">
+      <div class="lt-dot"></div>
+      <span id="lt-text">Listening…</span>
+    </div>
+
+    <div class="chat-input-row">
+      <input id="msg-input" class="chat-input" type="text"
+        placeholder="Type your message here…" autocomplete="off"
+        onkeydown="if(event.key==='Enter')sendMessage()"/>
+      <button class="btn-red send-btn" onclick="sendMessage()">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+
+    <button class="btn-inv export-btn" onclick="exportChat()">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export Conversation
+    </button>
+  </section>
+
+</main>
+
+
+<!-- ── Theme toggle ── -->
+<button id="theme-btn" onclick="toggleTheme()">
+  <svg id="icon-sun" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  <svg id="icon-moon" style="display:none" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+</button>
+
+<script src="nav.js"></script>
+<script>
+/* ─────────────────────────────────────────────────────────────────────────────
+   Necho Interpreter — all logic embedded to avoid ReferenceError issues
+───────────────────────────────────────────────────────────────────────────── */
+'use strict';
+
+const API = 'http://localhost:5000';
+
+// ── State ──────────────────────────────────────────────────────────────────
+let lastCount      = 0;
+let atBottom       = true;
+let isOnline       = false;
+let isListening    = false;
+let cameraEnabled  = true;
+let recognition    = null;
+
+// ── Session participants ────────────────────────────────────────────────────
+let speakerName   = 'Speaker';
+let disabledName  = 'Signer';
+
+function startSession() {
+  var sn = (document.getElementById('speaker-name-input').value || '').trim();
+  var dn = (document.getElementById('disabled-name-input').value || '').trim();
+  if (!sn || !dn) {
+    // highlight empty fields
+    if (!sn) document.getElementById('speaker-name-input').style.borderColor = '#ef4444';
+    if (!dn) document.getElementById('disabled-name-input').style.borderColor = '#ef4444';
+    return;
+  }
+  speakerName  = sn;
+  disabledName = dn;
+  var overlay = document.getElementById('session-overlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Boot — runs after DOM is ready
+───────────────────────────────────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+  // Wire up the MJPEG img — show overlay if stream can't load
+  var videoImg = document.getElementById('video-feed');
+  if (videoImg) {
+    videoImg.onload  = function() { showVideoOnline(); };
+    videoImg.onerror = function() { showVideoOffline(); };
+  }
+
+  // Disable mic button if browser doesn't support Web Speech API
+  const hasSR = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+  if (!hasSR) {
+    const mb = document.getElementById('cam-mic-btn');
+    if (mb) { mb.disabled = true; mb.title = 'Needs Chrome or Edge'; }
+  }
+
+  // Track scroll so we don't force-scroll when user reads old messages
+  const chatBox = document.getElementById('chat-box');
+  if (chatBox) {
+    chatBox.addEventListener('scroll', () => {
+      atBottom = chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight < 80;
+    });
+  }
+
+  // Start polling
+  pollStatus();
+  pollConversation();
+});
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Video feed helpers — MJPEG stream served by local Flask backend
+───────────────────────────────────────────────────────────────────────────── */
+function showVideoOffline() {
+  if (!cameraEnabled) return; // user-disabled camera takes precedence
+  var feed    = document.getElementById('video-feed');
+  var overlay = document.getElementById('video-offline');
+  if (feed)    feed.style.display    = 'none';
+  if (overlay) overlay.style.display = 'flex';
+}
+
+function showVideoOnline() {
+  if (!cameraEnabled) return; // user-disabled camera takes precedence
+  var feed    = document.getElementById('video-feed');
+  var overlay = document.getElementById('video-offline');
+  if (feed)    feed.style.display    = 'block';
+  if (overlay) overlay.style.display = 'none';
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Camera enable / disable
+───────────────────────────────────────────────────────────────────────────── */
+var CAM_ON_SVG  = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 10l4.553-2.069A1 1 0 0121 8.882v6.236a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>';
+var CAM_OFF_SVG = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 10l4.553-2.069A1 1 0 0121 8.882v6.236a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/><line x1="2" y1="2" x2="22" y2="22" stroke-width="2"/></svg>';
+
+function toggleCamera() {
+  cameraEnabled = !cameraEnabled;
+  var videoImg    = document.getElementById('video-feed');
+  var camOffOver  = document.getElementById('video-cam-off');
+  var backOffOver = document.getElementById('video-offline');
+  var btn         = document.getElementById('cam-btn');
+
+  if (cameraEnabled) {
+    if (videoImg)    { videoImg.src = API + '/video_feed'; videoImg.style.display = 'block'; }
+    if (camOffOver)  camOffOver.style.display  = 'none';
+    if (backOffOver) backOffOver.style.display = 'none';
+    if (btn)         { btn.innerHTML = CAM_ON_SVG + ' Camera'; btn.classList.remove('ctrl-off'); btn.classList.add('ctrl-on'); }
+  } else {
+    if (videoImg)    { videoImg.src = ''; videoImg.style.display = 'none'; }
+    if (backOffOver) backOffOver.style.display = 'none';
+    if (camOffOver)  camOffOver.style.display  = 'flex';
+    if (btn)         { btn.innerHTML = CAM_OFF_SVG + ' Camera'; btn.classList.remove('ctrl-on'); btn.classList.add('ctrl-off'); }
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Online / offline UI state
+───────────────────────────────────────────────────────────────────────────── */
+function setOnline(online) {
+  if (online === isOnline) return;
+  isOnline = online;
+
+  const badgeText = document.getElementById('live-badge-text');
+  const badge     = document.getElementById('live-badge');
+  const hud       = document.getElementById('live-hud');
+  const sub       = document.getElementById('hud-sub');
+
+  if (badgeText) badgeText.textContent = online ? 'Connected' : 'Connecting…';
+  if (badge) {
+    badge.classList.toggle('badge-connecting', !online);
+    badge.classList.toggle('badge-online',     online);
+  }
+  if (hud) hud.style.borderColor = online ? '' : 'rgba(255,107,138,.4)';
+  if (sub) sub.textContent = online
+    ? 'Secure Handshake Established'
+    : 'localhost:5000 offline — run testcap.py';
+
+  if (online) {
+    showVideoOnline();
+  } else {
+    showVideoOffline();
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Status polling — GET /status  (~4 fps)
+   The local backend processes the camera itself; we just read the result.
+───────────────────────────────────────────────────────────────────────────── */
+function pollStatus() {
+  fetch(API + '/status')
+    .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
+    .then(function(d) {
+      setOnline(true);
+
+      // Hand status
+      var hs = document.getElementById('hand-status');
+      if (hs) {
+        hs.textContent = d.hand_detected ? 'Detected' : 'No Hand';
+        hs.className   = 'status-val ' + (d.hand_detected ? 'status-yes' : 'status-no');
+      }
+
+      // Gesture + confidence
+      var gv = document.getElementById('gesture-val');
+      var cv = document.getElementById('conf-val');
+      if (gv) gv.textContent = d.gesture || '—';
+      if (cv) cv.textContent = d.gesture ? (d.confidence * 100).toFixed(1) + '%' : '—';
+
+      // Add Gesture button
+      var btn = document.getElementById('add-gesture-btn');
+      if (btn) {
+        btn.disabled = !d.gesture;
+        var plus = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+        btn.innerHTML = plus + (d.gesture ? ' Add "' + esc(d.gesture) + '"' : ' Add Gesture to Chat');
+      }
+    })
+    .catch(function() { setOnline(false); })
+    .finally(function() { setTimeout(pollStatus, 250); });
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Polling — /get_conversation  (every 600 ms)
+───────────────────────────────────────────────────────────────────────────── */
+function pollConversation() {
+  fetch(API + '/get_conversation')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.length !== lastCount) {
+        lastCount = data.length;
+        renderChat(data);
+      }
+    })
+    .catch(function() {})
+    .finally(function() { setTimeout(pollConversation, 600); });
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Chat rendering
+───────────────────────────────────────────────────────────────────────────── */
+function renderChat(data) {
+  var box   = document.getElementById('chat-box');
+  var empty = document.getElementById('chat-empty');
+  if (!box) return;
+
+  if (!data || data.length === 0) {
+    if (empty) empty.style.display = 'flex';
+    box.querySelectorAll('.chat-msg').forEach(function(el) { el.remove(); });
+    return;
+  }
+
+  if (empty) empty.style.display = 'none';
+  box.querySelectorAll('.chat-msg').forEach(function(el) { el.remove(); });
+  data.forEach(function(entry) {
+    var el = buildMessage(entry);
+    if (el) box.appendChild(el);
+  });
+
+  if (atBottom) box.scrollTop = box.scrollHeight;
+}
+
+function buildMessage(e) {
+  if (!e || !e.type) return null;
+
+  var article  = document.createElement('article');
+  article.className = 'chat-msg';
+
+  var tagClass, icon, extraHTML = '';
+
+  if (e.type === 'gesture') {
+    tagClass = 'msg-tag-gesture'; icon = '👋';
+    var conf = typeof e.confidence === 'number' ? (e.confidence * 100).toFixed(1) : '0.0';
+    var auto = e.auto_sent ? '<span class="msg-auto-badge">AUTO</span>' : '';
+    extraHTML = '<div class="msg-footer">' + auto + '<span class="msg-meta">Confidence: ' + conf + '%</span></div>';
+  } else if (e.type === 'voice') {
+    tagClass = 'msg-tag-voice'; icon = '🎤';
+  } else {
+    tagClass = 'msg-tag-text';  icon = '✏️';
+  }
+
+  // Determine sender name based on message type
+  var senderName = e.type === 'gesture' ? disabledName : speakerName;
+
+  article.innerHTML =
+    '<div class="msg-header">' +
+      '<span class="msg-tag ' + tagClass + '">' + icon + ' ' + e.type.toUpperCase() + '</span>' +
+      '<span style="font-size:11px;font-weight:700;color:var(--muted);margin-left:2px;">' + esc(senderName) + '</span>' +
+      '<span class="msg-time">' + esc(e.timestamp || '') + '</span>' +
+    '</div>' +
+    '<div class="msg-body">' + esc(e.content || '') + '</div>' +
+    extraHTML;
+
+  return article;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Actions
+───────────────────────────────────────────────────────────────────────────── */
+function addGesture() {
+  fetch(API + '/add_gesture', { method: 'POST' })
+    .then(function(r) { return r.json(); })
+    .then(function(d) { if (!d.success) showToast(d.message || 'No gesture detected', 'warn'); })
+    .catch(function() { showToast('Cannot reach backend — is app.py running?', 'error'); });
+}
+
+function sendMessage() {
+  var inp = document.getElementById('msg-input');
+  var txt = (inp.value || '').trim();
+  if (!txt) return;
+  inp.value = '';
+  fetch(API + '/send_message', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: txt, type: 'text' }),
+  }).catch(function() { showToast('Cannot reach backend', 'error'); });
+}
+
+function clearChat() {
+  if (!confirm('Clear the entire conversation?')) return;
+  fetch(API + '/clear_conversation', { method: 'POST' })
+    .then(function() { lastCount = 0; renderChat([]); })
+    .catch(function() { showToast('Cannot reach backend', 'error'); });
+}
+
+function exportChat() {
+  window.location.href = API + '/export';
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Voice input (Chrome / Edge only)
+───────────────────────────────────────────────────────────────────────────── */
+function toggleMic() {
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { showToast('Voice input needs Chrome or Edge', 'warn'); return; }
+  isListening ? stopMic() : startMic();
+}
+
+function startMic() {
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  try { recognition = new SR(); }
+  catch(e) { showToast('Could not initialise microphone', 'error'); return; }
+
+  recognition.continuous     = true;
+  recognition.interimResults = true;
+  recognition.lang           = 'en-US';
+
+  recognition.onstart = function() { isListening = true; setMicUI(true); };
+
+  recognition.onresult = function(event) {
+    var interim = '';
+    for (var i = event.resultIndex; i < event.results.length; i++) {
+      var r = event.results[i];
+      if (r.isFinal) {
+        var txt = r[0].transcript.trim();
+        if (txt) {
+          fetch(API + '/send_message', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: txt, type: 'voice' }),
+          });
+          showLiveTranscript('');
+        }
+      } else { interim += r[0].transcript; }
+    }
+    if (interim) showLiveTranscript(interim);
+    document.getElementById('msg-input').value = interim;
+  };
+
+  var _netRetries = 0;
+  recognition.onerror = function(ev) {
+    if (ev.error === 'no-speech') return;
+    if (ev.error === 'network' && _netRetries < 3) {
+      // Chrome sometimes throws network on first attempt — retry silently
+      _netRetries++;
+      setTimeout(function() { try { recognition.start(); } catch(e) {} }, 500);
+      return;
+    }
+    _netRetries = 0;
+    var msgs = {
+      'not-allowed':  'Microphone denied. Allow it in the browser address bar.',
+      'network':      'Voice recognition unavailable. Check your internet connection and try again.',
+      'audio-capture':'No microphone found.',
+      'aborted':       null,
+    };
+    var m = msgs[ev.error];
+    if (m !== null && m !== undefined) showToast(m || 'Mic error: ' + ev.error, 'error');
+    if (ev.error !== 'aborted') { isListening = false; setMicUI(false); }
+  };
+
+  recognition.onend = function() {
+    if (isListening) {
+      setTimeout(function() { try { recognition.start(); } catch(e) {} }, 150);
+    } else { setMicUI(false); }
+  };
+
+  try { recognition.start(); }
+  catch(e) { showToast('Could not start mic. Check permissions.', 'error'); isListening = false; setMicUI(false); }
+}
+
+function stopMic() {
+  isListening = false;
+  var rem = (document.getElementById('msg-input').value || '').trim();
+  if (rem) {
+    fetch(API + '/send_message', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: rem, type: 'voice' }),
+    });
+  }
+  if (recognition) { try { recognition.stop(); } catch(e) {} recognition = null; }
+  showLiveTranscript('');
+  setMicUI(false);
+}
+
+var MIC_ICON  = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0014 0M12 19v3M9 22h6"/></svg>';
+var STOP_ICON = '<svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
+
+function setMicUI(on) {
+  var btn = document.getElementById('cam-mic-btn');
+  var inp = document.getElementById('msg-input');
+  if (btn) {
+    btn.innerHTML = on ? STOP_ICON + ' Listening' : MIC_ICON + ' Mic';
+    btn.classList.toggle('mic-on', on);
+    btn.classList.toggle('ctrl-on', on);
+    btn.title = on ? 'Stop listening' : 'Voice input (Chrome/Edge)';
+  }
+  if (inp) {
+    inp.placeholder = on ? 'Listening — speak now…' : 'Type your message here…';
+    if (!on) inp.value = '';
+  }
+}
+
+function showLiveTranscript(text) {
+  var el  = document.getElementById('live-transcript');
+  var txt = document.getElementById('lt-text');
+  if (!el) return;
+  el.style.display = text.trim() ? 'flex' : 'none';
+  if (txt && text.trim()) txt.textContent = text;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Utilities
+───────────────────────────────────────────────────────────────────────────── */
+function esc(s) {
+  var d = document.createElement('div');
+  d.textContent = String(s);
+  return d.innerHTML;
+}
+
+function showToast(msg, type) {
+  type = type || 'info';
+  var prev = document.getElementById('__toast');
+  if (prev) prev.remove();
+  var colors = { info: '#7c6ff7', warn: '#ffa552', error: '#ff6b8a', green: '#4ecca3' };
+  var el = document.createElement('div');
+  el.id = '__toast';
+  el.setAttribute('role', 'alert');
+  el.textContent = msg;
+  Object.assign(el.style, {
+    position: 'fixed', bottom: '22px', left: '50%',
+    transform: 'translateX(-50%)', padding: '10px 22px',
+    borderRadius: '10px', fontSize: '13px', fontWeight: '500',
+    color: '#fff', background: colors[type] || colors.info,
+    zIndex: '9999', pointerEvents: 'none',
+    boxShadow: '0 4px 20px rgba(0,0,0,.35)',
+    animation: 'toastIn .22s ease',
+  });
+  document.body.appendChild(el);
+  setTimeout(function() { el.remove(); }, 4200);
+}
+</script>
+</body>
+</html>

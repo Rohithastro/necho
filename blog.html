@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Blog — Necho Insights</title>
+  <meta name="description"
+    content="Read Necho's latest research, insights, and news on sign language AI, accessibility, and neural translation." />
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Iconify -->
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="blog.css" />
+
+  <style>
+    :root {
+      --bg: #050505;
+      --surface: #0f0a08;
+      --border: rgba(255, 255, 255, 0.07);
+      --accent: #e84d1c;
+      --accent2: #f59e0b;
+      --text: #fff5f0;
+      --muted: #8a6a5a;
+      --nav-bg: transparent;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #050505;
+      color: white;
+      overflow-x: hidden;
+    }
+
+    .font-serif {
+      font-family: 'Playfair Display', serif;
+    }
+
+    /* noise */
+    .noise-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+      opacity: 0.045;
+      mix-blend-mode: overlay;
+      background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+    }
+
+    /* ── Nav ── */
+    #nav {
+      background: transparent !important;
+      border-bottom: none !important;
+      backdrop-filter: none;
+      transition: background 0.5s, padding 0.4s;
+      padding: 2rem 3rem;
+      height: auto;
+    }
+
+    #nav.scrolled {
+      background: rgba(5, 5, 5, 0.9) !important;
+      backdrop-filter: blur(20px) !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+      padding: 1rem 3rem;
+    }
+
+    .nav-link {
+      color: rgba(255, 255, 255, 0.45);
+      letter-spacing: 0.06em;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .nav-link:hover {
+      color: white;
+    }
+
+    .nav-link.active {
+      color: white;
+    }
+
+    .nav-link.active::after {
+      background: linear-gradient(to right, #e84d1c, #f59e0b);
+    }
+
+    .logo-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ff7043, #f59e0b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-auth {
+      background: rgba(255, 255, 255, 0.95) !important;
+      color: #050505 !important;
+      border-radius: 9999px !important;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      padding: 0 22px;
+      height: 40px;
+    }
+
+    .nav-auth:hover {
+      background: white !important;
+      transform: scale(1.04) !important;
+    }
+
+    .hamburger {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .lang-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .acc-toggle {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    #mob-menu {
+      background: rgba(5, 5, 5, 0.97);
+      backdrop-filter: blur(32px);
+    }
+
+    .mob-link {
+      color: rgba(255, 255, 255, 0.45);
+      font-family: 'Inter', sans-serif;
+      font-size: 1.25rem;
+    }
+
+    .mob-link:hover,
+    .mob-link.active {
+      color: white;
+    }
+
+    .mob-auth {
+      background: rgba(255, 255, 255, 0.95);
+      color: #050505;
+    }
+
+    #theme-btn {
+      background: rgba(17, 17, 17, 0.9);
+      border-color: rgba(255, 255, 255, 0.08);
+      color: #e84d1c;
+    }
+
+    .acc-panel {
+      background: #111;
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .acc-opt {
+      border-color: rgba(255, 255, 255, 0.07);
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .acc-opt:hover {
+      border-color: rgba(232, 77, 28, 0.5);
+      color: white;
+    }
+
+    .acc-opt.on {
+      border-color: #e84d1c;
+      color: white;
+      background: rgba(232, 77, 28, 0.1);
+    }
+
+    .acc-dot {
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .acc-opt.on .acc-dot {
+      background: #e84d1c;
+      border-color: #e84d1c;
+    }
+
+    /* ── Footer ── */
+    footer {
+      background: #050505 !important;
+      border-color: rgba(255, 255, 255, 0.05) !important;
+      padding: 5rem 4rem 3rem;
+    }
+
+    .footer-col-h {
+      color: rgba(232, 77, 28, 0.8) !important;
+    }
+
+    .footer-lnk:hover {
+      color: white !important;
+    }
+
+    .footer-desc {
+      color: rgba(255, 255, 255, 0.3) !important;
+    }
+
+    .footer-ver {
+      color: rgba(232, 77, 28, 0.7) !important;
+      border-color: rgba(232, 77, 28, 0.2) !important;
+      background: rgba(232, 77, 28, 0.05) !important;
+    }
+
+    .footer-admin {
+      color: rgba(255, 255, 255, 0.25) !important;
+    }
+
+    .footer-admin-dot {
+      background: #e84d1c !important;
+    }
+
+    .footer-bottom {
+      color: rgba(255, 255, 255, 0.2) !important;
+      border-color: rgba(255, 255, 255, 0.05) !important;
+    }
+  </style>
+</head>
+
+<body data-page="blog">
+  <div class="noise-overlay"></div>
+
+  <!-- ===== NAV ===== -->
+  <nav id="nav">
+    <div class="nav-inner">
+      <a class="nav-logo" href="index.html">
+        <img class="nav-logo-img" src="logo.svg" alt="Necho" />
+      </a>
+      <div class="nav-links">
+        <a class="nav-link" data-page="home" href="index.html">Home</a>
+        <a class="nav-link" data-page="interpreter" href="interpreter.html">Interpreter</a>
+        <a class="nav-link" data-page="about" href="about.html">About Us</a>
+        <a class="nav-link active" data-page="blog" href="blog.html">Blog</a>
+      </div>
+      <div class="nav-actions">
+        <div class="lang-wrap">
+          <div class="lang-btn"><span id="lang-label">ENGLISH</span>
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </div>
+          <select id="lang-select" class="lang-select" onchange="changeLanguage(this.value)">
+            <option value="en">English</option>
+            <option value="hi">Hindi</option>
+            <option value="ta">Tamil</option>
+            <option value="te">Telugu</option>
+            <option value="kn">Kannada</option>
+            <option value="ml">Malayalam</option>
+            <option value="mr">Marathi</option>
+            <option value="gu">Gujarati</option>
+          </select>
+        </div>
+        <div class="acc-wrap">
+          <button class="acc-toggle" onclick="toggleAccPanel()" aria-label="Accessibility">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="12" cy="4" r="1" />
+              <path d="M6.2 8.5a10 10 0 0 1 11.6 0M12 6v5m0 0l-3 5m3-5l3 5" />
+            </svg>
+          </button>
+          <div id="acc-panel" class="acc-panel">
+            <div class="acc-panel-head"><span class="acc-panel-title">Inclusive Settings</span>
+              <button class="acc-x" onclick="toggleAccPanel()"><svg width="16" height="16" fill="none"
+                  stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg></button>
+            </div>
+            <button id="acc-gray" class="acc-opt" onclick="toggleAcc('gray')">Grayscale<div class="acc-dot"></div>
+            </button>
+            <button id="acc-contrast" class="acc-opt" onclick="toggleAcc('contrast')">High Contrast<div class="acc-dot">
+              </div></button>
+            <button id="acc-motion" class="acc-opt" onclick="toggleAcc('motion')">Reduced Motion<div class="acc-dot">
+              </div></button>
+            <button id="acc-lineh" class="acc-opt" onclick="toggleAcc('lineh')">Relaxed Spacing<div class="acc-dot">
+              </div></button>
+            <button id="acc-wordsp" class="acc-opt" onclick="toggleAcc('wordsp')">Word Spacing<div class="acc-dot">
+              </div></button>
+          </div>
+        </div>
+        <a id="nav-signin" class="nav-auth" href="signin.html">Sign In</a>
+        <button id="nav-signout" class="nav-auth" onclick="logout()" style="display:none">Sign Out</button>
+        <button class="hamburger" onclick="toggleMob()">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile menu -->
+  <div id="mob-menu">
+    <button class="mob-close" onclick="toggleMob()"><svg width="30" height="30" fill="none" stroke="white"
+        stroke-width="2" viewBox="0 0 24 24">
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+      </svg></button>
+    <a class="mob-link" data-page="home" href="index.html">Home</a>
+    <a class="mob-link" data-page="interpreter" href="interpreter.html">Interpreter</a>
+    <a class="mob-link" data-page="about" href="about.html">About Us</a>
+    <a class="mob-link active" data-page="blog" href="blog.html">Blog</a>
+    <a id="mob-signin" class="mob-auth" href="signin.html">Sign In</a>
+    <button id="mob-signout" class="mob-auth" onclick="logout()" style="display:none">Sign Out</button>
+  </div>
+
+  <!-- ===== THERMODYNAMIC GRID BACKGROUND ===== -->
+  <canvas id="thermal-canvas"
+    style="position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;"></canvas>
+
+  <script>
+    (function () {
+      const canvas = document.getElementById('thermal-canvas');
+      const ctx = canvas.getContext('2d', { alpha: false });
+
+      const RESOLUTION = 18;   // cell size in px — lower = finer
+      const COOLING = 0.965; // trail persistence (higher = longer trails)
+      const BRUSH_RADIUS = 2;
+
+      let grid, cols, rows, W, H;
+      const mouse = { x: -9999, y: -9999, px: -9999, py: -9999, active: false };
+
+      function getThermalColor(t) {
+        // Maps 0→1 temp to a deep black-purple → orange → white thermal palette
+        const r = Math.min(255, Math.max(0, t * 2.6 * 255));
+        const g = Math.min(255, Math.max(0, (t * 2.6 - 1.0) * 255));
+        const b = Math.min(255, Math.max(0, (t * 2.6 - 2.0) * 255 + t * 55));
+        return `rgb(${r + 8},${g + 8},${b + 14})`;
+      }
+
+      function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+        cols = Math.ceil(W / RESOLUTION);
+        rows = Math.ceil(H / RESOLUTION);
+        grid = new Float32Array(cols * rows).fill(0);
+      }
+
+      function onMove(e) {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+        mouse.active = true;
+      }
+      function onLeave() { mouse.active = false; }
+
+      function frame() {
+        // Inject heat along mouse path (sub-stepped for gaps)
+        if (mouse.active) {
+          const dx = mouse.x - mouse.px;
+          const dy = mouse.y - mouse.py;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const steps = Math.max(1, Math.ceil(dist / (RESOLUTION / 2)));
+          for (let s = 0; s <= steps; s++) {
+            const f = s / steps;
+            const cx = Math.floor((mouse.px + dx * f) / RESOLUTION);
+            const cy = Math.floor((mouse.py + dy * f) / RESOLUTION);
+            for (let i = -BRUSH_RADIUS; i <= BRUSH_RADIUS; i++) {
+              for (let j = -BRUSH_RADIUS; j <= BRUSH_RADIUS; j++) {
+                const gc = cx + i, gr = cy + j;
+                if (gc >= 0 && gc < cols && gr >= 0 && gr < rows) {
+                  const d = Math.sqrt(i * i + j * j);
+                  if (d <= BRUSH_RADIUS) {
+                    const idx = gc + gr * cols;
+                    grid[idx] = Math.min(1, grid[idx] + 0.32 * (1 - d / BRUSH_RADIUS));
+                  }
+                }
+              }
+            }
+          }
+        }
+        mouse.px = mouse.x;
+        mouse.py = mouse.y;
+
+        // Clear to deep black
+        ctx.fillStyle = '#050505';
+        ctx.fillRect(0, 0, W, H);
+
+        // Render cells
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const idx = c + r * cols;
+            const t = grid[idx];
+            grid[idx] *= COOLING;
+
+            if (t > 0.05) {
+              const x = c * RESOLUTION;
+              const y = r * RESOLUTION;
+              const size = RESOLUTION * (0.75 + t * 0.55);
+              const off = (RESOLUTION - size) / 2;
+              ctx.fillStyle = getThermalColor(t);
+              ctx.fillRect(x + off, y + off, size, size);
+            } else if (c % 2 === 0 && r % 2 === 0) {
+              // Subtle cold-cell dots for structure
+              ctx.fillStyle = '#1a1a1f';
+              ctx.fillRect(
+                c * RESOLUTION + RESOLUTION / 2 - 1,
+                r * RESOLUTION + RESOLUTION / 2 - 1,
+                2, 2
+              );
+            }
+          }
+        }
+
+        requestAnimationFrame(frame);
+      }
+
+      window.addEventListener('resize', resize);
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseleave', onLeave);
+      resize();
+      frame();
+    })();
+  </script>
+
+  <main class="blog-main" style="position:relative;z-index:1;">
+    <div class="container mx-auto px-6 pt-32 pb-20">
+      <div class="blog-header">
+        <div>
+          <div class="blog-label">Editorial</div>
+          <h1 class="font-serif text-5xl md:text-7xl font-medium tracking-tight text-white/90">
+            Necho <span class="italic font-light text-orange-500">Insights.</span>
+          </h1>
+        </div>
+        <div id="admin-add-btn" style="display:none">
+          <button class="add-post-btn" onclick="openModal()" aria-label="Add post">
+            <iconify-icon icon="lucide:plus"></iconify-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="blog-grid mt-20" id="blog-grid">
+        <!-- Posts rendered dynamically by blog.js -->
+      </div>
+    </div>
+  </main>
+
+  <!-- ===== BLOG EDITOR OVERLAY ===== -->
+  <div id="blog-editor" class="blog-editor-overlay">
+    <div class="editor-header">
+      <button class="editor-back" onclick="closeEditor()">
+        <iconify-icon icon="lucide:arrow-left" class="text-sm"></iconify-icon>
+        Back
+      </button>
+      <span class="editor-header-title">Create Masterpiece</span>
+      <div class="editor-header-actions">
+        <button class="editor-publish-btn btn-red" onclick="publishPost()">Publish</button>
+      </div>
+    </div>
+
+    <div class="editor-main">
+      <div class="editor-left">
+        <input id="ed-title" class="editor-title" type="text" placeholder="Post Title…" />
+
+        <div class="editor-slug-row">
+          <span class="editor-slug-label">Slug</span>
+          <span class="editor-slug-prefix">necho.ai/blog/</span>
+          <input id="ed-slug" class="editor-slug-input" type="text" placeholder="auto-generated" />
+        </div>
+
+        <div class="editor-toolbar">
+          <button class="tb-btn" onclick="execCmd('bold')" title="Bold">B</button>
+          <button class="tb-btn" onclick="execCmd('italic')" title="Italic">I</button>
+          <button class="tb-btn" onclick="execCmd('underline')" title="Underline">U</button>
+          <div class="tb-sep"></div>
+          <button class="tb-btn" onclick="insertHeading('h2')" title="Heading 2">H2</button>
+          <button class="tb-btn" onclick="insertHeading('h3')" title="Heading 3">H3</button>
+          <div class="tb-sep"></div>
+          <button class="tb-btn" onclick="execCmd('insertUnorderedList')" title="Bullet List">List</button>
+          <button class="tb-btn" onclick="execCmd('insertOrderedList')" title="Numbered List">Numbered</button>
+          <button class="tb-btn" onclick="execCmd('formatBlock','blockquote')" title="Blockquote">Quote</button>
+          <div class="tb-sep"></div>
+          <button class="tb-btn" onclick="insertLink()" title="Insert Link">Link</button>
+          <div class="tb-sep"></div>
+          <button class="tb-btn tb-clear" onclick="execCmd('removeFormat')" title="Clear Formatting">Clear</button>
+        </div>
+
+        <div id="ed-body" class="editor-body" contenteditable="true"></div>
+      </div>
+
+      <div class="editor-right">
+        <div class="ed-section">
+          <div class="ed-section-title">Category</div>
+          <select id="ed-category" class="ed-select">
+            <option value="Research">Research</option>
+            <option value="Insights">Insights</option>
+            <option value="Corporate">Corporate</option>
+            <option value="Technology">Technology</option>
+            <option value="Accessibility">Accessibility</option>
+          </select>
+        </div>
+
+        <div class="ed-section">
+          <div class="ed-section-title">Featured Image</div>
+          <div class="ed-img-upload">
+            <label class="ed-upload-btn">
+              <iconify-icon icon="lucide:upload-cloud"></iconify-icon>
+              Upload
+              <input id="ed-img-file" type="file" accept="image/*" style="display:none" />
+            </label>
+            <div class="ed-or">or URL</div>
+            <input id="ed-img-url" class="ed-text-input" type="url" placeholder="https://…" />
+            <img id="ed-img-preview" class="ed-img-preview" src="" style="display:none" alt="Preview" />
+          </div>
+        </div>
+
+        <div class="ed-section">
+          <div class="ed-section-title">Tags <span class="ed-hint">Enter or comma</span></div>
+          <input id="ed-tags-input" class="ed-text-input" type="text" placeholder="Add tag…" />
+          <div id="ed-tags-list" class="ed-tags-list"></div>
+        </div>
+
+        <div class="ed-section ed-seo-section">
+          <div class="ed-section-title">SEO Optimization</div>
+          <label class="ed-label">Meta Description</label>
+          <textarea id="ed-meta-desc" class="ed-textarea" maxlength="160"
+            placeholder="Summary for Google (120-160 chars)…"></textarea>
+          <div class="ed-counter-row">
+            <span></span>
+            <span id="ed-char-count" class="ed-counter">0 / 160</span>
+          </div>
+
+          <label class="ed-label">Focus Keyword</label>
+          <input id="ed-keyword" class="ed-text-input" type="text" placeholder="Primary keyword…" />
+
+          <div class="seo-score-wrap">
+            <div class="seo-score-header">
+              <span class="seo-score-label">Global SEO Score</span>
+              <span id="seo-score-val" class="seo-score-val red">0%</span>
+            </div>
+            <div class="seo-bar-track">
+              <div id="seo-score-bar" class="seo-bar-fill red" style="width:0%"></div>
+            </div>
+            <div id="seo-checks" class="seo-checks"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== POST VIEW OVERLAY ===== -->
+  <div id="post-view" class="post-view-overlay">
+    <button class="pv-close" onclick="closePostView()" title="Close">
+      <iconify-icon icon="lucide:x"></iconify-icon>
+    </button>
+    <div class="post-view-inner">
+      <img id="pv-img" class="pv-hero-img" src="" alt="" style="display:none" />
+      <div id="pv-meta" class="pv-meta"></div>
+      <h1 id="pv-title" class="pv-title font-serif"></h1>
+      <div id="pv-tags" class="pv-tags"></div>
+      <div id="pv-body" class="pv-body"></div>
+    </div>
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <!--
+    <div class="overflow-hidden mb-12 -mx-4 select-none pointer-events-none">
+      <h2 class="text-[12vw] leading-[0.85] tracking-tighter text-white/[0.04] font-bold whitespace-nowrap">NECHO.</h2>
+    </div>
+    -->
+    <div class="footer-grid">
+      <div><img src="logo.svg" alt="Necho" class="footer-logo-img" />
+        <p class="footer-desc">Universal communication through neural interpretation and inclusive design on a global
+          scale.</p>
+      </div>
+      <div>
+        <div class="footer-col-h">Platform</div>
+        <div class="footer-lnks"><a class="footer-lnk" href="interpreter.html">Interpreter</a><a class="footer-lnk"
+            href="blog.html">Blog &amp; Insights</a></div>
+      </div>
+      <div>
+        <div class="footer-col-h">Company</div>
+        <div class="footer-lnks"><a class="footer-lnk" href="about.html">About Us</a><a class="footer-lnk"
+            href="privacy.html">Privacy Policy</a><a class="footer-lnk" href="terms.html">Terms of Service</a></div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-start;gap:1rem;">
+        <button id="footer-admin-btn" class="footer-admin" onclick="activateAdmin()">
+          <div class="footer-admin-dot pulse"></div>Administrative Portal
+        </button>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 NECHO. ALL RIGHTS RESERVED.</p>
+      <div class="footer-cities"><span>CHENNAI</span></div>
+    </div>
+  </footer>
+
+  <button id="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+    <svg id="icon-sun" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="4" />
+      <line x1="12" y1="2" x2="12" y2="4" />
+      <line x1="12" y1="20" x2="12" y2="22" />
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+      <line x1="2" y1="12" x2="4" y2="12" />
+      <line x1="20" y1="12" x2="22" y2="12" />
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+    </svg>
+    <svg id="icon-moon" style="display:none" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"
+      viewBox="0 0 24 24">
+      <path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+    </svg>
+  </button>
+
+  <script src="nav.js"></script>
+  <script src="blog.js"></script>
+  <script>
+    // Reveal observer
+    const ro = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in-view'); });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+
+    // Navbar scroll
+    const navEl = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      navEl.classList.toggle('scrolled', window.scrollY > 60);
+    }, { passive: true });
+  </script>
+</body>
+
+</html>
