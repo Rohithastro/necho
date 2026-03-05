@@ -4,26 +4,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Sign Up — Necho</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Sign Up - Necho</title>
+  <link rel="stylesheet" href="tailwind-gen.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap"
-    rel="stylesheet">
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" /></noscript>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="auth.css" />
 </head>
 
 <body data-page="signup">
 
-  <!-- ===== NAV ===== -->
   <nav id="nav">
     <div class="nav-inner">
       <a class="nav-logo" href="index.html"><img class="nav-logo-img" src="logo.svg" alt="Necho" /></a>
       <div class="nav-links">
         <a class="nav-link" data-page="home" href="index.html">HOME</a>
-        <a class="nav-link" data-page="interpreter" href="interpreter.html">INTERPRETER</a>
+        <a class="nav-link interp-gate" data-page="interpreter" href="interpreter.html">INTERPRETER</a>
         <a class="nav-link" data-page="about" href="about.html">ABOUT US</a>
         <a class="nav-link" data-page="blog" href="blog.html">BLOG</a>
       </div>
@@ -69,6 +67,9 @@
               </div></button>
           </div>
         </div>
+        <button id="nav-profile" onclick="toggleProfilePanel()" title="Profile" style="display:none">
+          <span id="nav-profile-initial">U</span>
+        </button>
         <button class="hamburger" onclick="toggleMob()"><svg width="24" height="24" fill="none" stroke="currentColor"
             stroke-width="2" viewBox="0 0 24 24">
             <line x1="3" y1="12" x2="21" y2="12" />
@@ -85,16 +86,14 @@
         <line x1="6" y1="6" x2="18" y2="18" />
       </svg></button>
     <a class="mob-link" data-page="home" href="index.html">HOME</a>
-    <a class="mob-link" data-page="interpreter" href="interpreter.html">INTERPRETER</a>
+    <a class="mob-link interp-gate" data-page="interpreter" href="interpreter.html">INTERPRETER</a>
     <a class="mob-link" data-page="about" href="about.html">ABOUT US</a>
     <a class="mob-link" data-page="blog" href="blog.html">BLOG</a>
   </div>
 
-  <!-- ===== CONTENT ===== -->
   <main class="auth-full-screen">
     <div class="auth-container">
 
-      <!-- Left Hero Side -->
       <div class="auth-hero">
         <div class="auth-strips">
           <div class="auth-strip"></div>
@@ -112,7 +111,6 @@
         </h1>
       </div>
 
-      <!-- Right Form Side -->
       <div class="auth-form-side">
         <div class="auth-icon">
           <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none"
@@ -131,7 +129,7 @@
         </div>
 
         <h2>Get Started</h2>
-        <p>Welcome to Necho — Let's build a bridge together.</p>
+        <p>Welcome to Necho. Let's build a bridge together.</p>
 
         <form id="signup-form" noValidate>
           <div class="form-group">
@@ -147,13 +145,25 @@
 
           <div class="form-group">
             <label for="signup-password" class="form-label-new">Create new password</label>
-            <input type="password" id="signup-password" class="form-input-new" required />
+            <div class="input-wrap">
+              <input type="password" id="signup-password" class="form-input-new" required />
+              <button type="button" class="pass-toggle" onclick="togglePass('signup-password', this)" tabindex="-1" aria-label="Toggle password visibility">
+                <svg class="eye-show" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="eye-hide" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              </button>
+            </div>
             <p id="password-error" class="auth-error-new"></p>
           </div>
 
           <div class="form-group">
             <label for="signup-confirm" class="form-label-new">Confirm password</label>
-            <input type="password" id="signup-confirm" placeholder="••••••••" class="form-input-new" required />
+            <div class="input-wrap">
+              <input type="password" id="signup-confirm" placeholder="••••••••" class="form-input-new" required />
+              <button type="button" class="pass-toggle" onclick="togglePass('signup-confirm', this)" tabindex="-1" aria-label="Toggle password visibility">
+                <svg class="eye-show" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="eye-hide" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              </button>
+            </div>
           </div>
 
           <p id="auth-error" class="auth-error-new" style="margin-bottom:1rem;"></p>
@@ -172,23 +182,6 @@
     </div>
   </main>
 
-  <button id="theme-btn" onclick="toggleTheme()">
-    <svg id="icon-sun" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-      <circle cx="12" cy="12" r="4" />
-      <line x1="12" y1="2" x2="12" y2="4" />
-      <line x1="12" y1="20" x2="12" y2="22" />
-      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-      <line x1="2" y1="12" x2="4" y2="12" />
-      <line x1="20" y1="12" x2="22" y2="12" />
-      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-    </svg>
-    <svg id="icon-moon" style="display:none" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5"
-      viewBox="0 0 24 24">
-      <path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-    </svg>
-  </button>
   <script src="nav.js"></script>
   <script type="module" src="firebase-nav.js"></script>
   <script type="module" src="signup-page.js"></script>

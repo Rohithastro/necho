@@ -1,20 +1,14 @@
-/* ============================================================
-   NECHO — Interpreter Page Script (interpreter.js)
-   Connects to: https://romram1-slr.hf.space
-   ============================================================ */
-
 const BACKEND = 'https://romram1-slr.hf.space';
 let currentGesture = null;
 let conversation   = [];
 
-/* ─── Poll status (/status) every 500ms ─────────────────── */
 async function fetchStatus() {
   try {
     const res  = await fetch(`${BACKEND}/status`);
     if (!res.ok) return;
     const data = await res.json();
     updateStatusUI(data);
-  } catch { /* backend unreachable */ }
+  } catch {}
 }
 
 function updateStatusUI(data) {
@@ -33,8 +27,8 @@ function updateStatusUI(data) {
     handEl.innerHTML = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> No Hand';
   }
 
-  gestEl.textContent = data.gesture || '—';
-  confEl.textContent = data.gesture ? `${(data.confidence * 100).toFixed(1)}%` : '—';
+  gestEl.textContent = data.gesture || '-';
+  confEl.textContent = data.gesture ? `${(data.confidence * 100).toFixed(1)}%` : '-';
 
   addBtn.disabled = !data.gesture;
   if (data.gesture) {
@@ -50,7 +44,6 @@ function updateStatusUI(data) {
   }
 }
 
-/* ─── Poll conversation every 600ms ─────────────────────── */
 async function fetchConversation() {
   try {
     const res  = await fetch(`${BACKEND}/get_conversation`);
@@ -60,7 +53,7 @@ async function fetchConversation() {
       conversation = data;
       renderConversation();
     }
-  } catch { /* backend unreachable */ }
+  } catch {}
 }
 
 function renderConversation() {
@@ -86,7 +79,6 @@ function renderConversation() {
   box.scrollTop = box.scrollHeight;
 }
 
-/* ─── Add gesture to chat ────────────────────────────────── */
 async function addGesture() {
   if (!currentGesture) return;
   try {
@@ -96,7 +88,6 @@ async function addGesture() {
   } catch { alert('Backend unreachable.'); }
 }
 
-/* ─── Send text message ──────────────────────────────────── */
 async function sendMessage() {
   const input = document.getElementById('msg-input');
   const text  = input.value.trim();
@@ -109,21 +100,17 @@ async function sendMessage() {
     });
     input.value = '';
   } catch {
-    /* fallback: add locally */
-    const now   = new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+    const now = new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
     conversation.push({ type:'user', content:text, timestamp:now });
     renderConversation();
     input.value = '';
   }
 }
 
-/* ─── Export ─────────────────────────────────────────────── */
 function exportChat() {
-  // Try backend export endpoint first
   try {
     window.location.href = `${BACKEND}/export`;
   } catch {
-    // Fallback: download as text
     const lines = conversation.map(e => `[${e.timestamp}] ${e.type.toUpperCase()}: ${e.content}`).join('\n');
     const blob  = new Blob([lines], { type: 'text/plain' });
     const url   = URL.createObjectURL(blob);
@@ -133,10 +120,8 @@ function exportChat() {
   }
 }
 
-/* ─── Start polling ──────────────────────────────────────── */
 setInterval(fetchStatus,       500);
 setInterval(fetchConversation, 600);
 
-// Initial fetch
 fetchStatus();
 fetchConversation();

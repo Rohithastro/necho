@@ -4,20 +4,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>About Us — Necho</title>
+  <title>About Us - Necho</title>
   <meta name="description"
     content="Necho is on a mission to ensure communication is a fundamental human right, accessible to everyone, everywhere." />
 
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Iconify -->
-  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-  <!-- Fonts -->
+  <link rel="stylesheet" href="tailwind-gen.css" />
+  
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js" defer></script>
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
-    rel="stylesheet">
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" /></noscript>
 
   <link rel="stylesheet" href="style.css" />
 
@@ -44,22 +42,10 @@
       font-family: 'Playfair Display', serif;
     }
 
-    /* noise */
-    .noise-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 5;
-      pointer-events: none;
-      opacity: 0.045;
-      mix-blend-mode: overlay;
-      background-image: url("https://grainy-gradients.vercel.app/noise.svg");
-    }
-
-    /* reveal */
+    
     .reveal {
       opacity: 0;
       transform: translate3d(0, 18px, 0);
-      will-change: opacity, transform;
       transition: opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
@@ -68,7 +54,7 @@
       transform: translate3d(0, 0, 0);
     }
 
-    /* ── Nav ── */
+    
     #nav {
       background: transparent !important;
       border-bottom: none !important;
@@ -145,33 +131,6 @@
       border-color: rgba(255, 255, 255, 0.1);
     }
 
-    #mob-menu {
-      background: rgba(5, 5, 5, 0.97);
-      backdrop-filter: blur(32px);
-    }
-
-    .mob-link {
-      color: rgba(255, 255, 255, 0.45);
-      font-family: 'Inter', sans-serif;
-      font-size: 1.25rem;
-    }
-
-    .mob-link:hover,
-    .mob-link.active {
-      color: white;
-    }
-
-    .mob-auth {
-      background: rgba(255, 255, 255, 0.95);
-      color: #050505;
-    }
-
-    #theme-btn {
-      background: rgba(17, 17, 17, 0.9);
-      border-color: rgba(255, 255, 255, 0.08);
-      color: #e84d1c;
-    }
-
     .acc-panel {
       background: #111;
       border-color: rgba(255, 255, 255, 0.08);
@@ -202,7 +161,7 @@
       border-color: #e84d1c;
     }
 
-    /* ── Section label ── */
+    
     .section-label {
       display: inline-flex;
       align-items: center;
@@ -223,7 +182,7 @@
       background: linear-gradient(to right, #e84d1c, #f59e0b);
     }
 
-    /* ── Footer ── */
+    
     footer {
       background: #050505 !important;
       border-color: rgba(255, 255, 255, 0.05) !important;
@@ -248,20 +207,12 @@
       background: rgba(232, 77, 28, 0.05) !important;
     }
 
-    .footer-admin {
-      color: rgba(255, 255, 255, 0.25) !important;
-    }
-
-    .footer-admin-dot {
-      background: #e84d1c !important;
-    }
-
     .footer-bottom {
       color: rgba(255, 255, 255, 0.2) !important;
       border-color: rgba(255, 255, 255, 0.05) !important;
     }
 
-    /* ── About-specific ── */
+    
     .about-hero-line {
       display: block;
       overflow: hidden;
@@ -381,9 +332,7 @@
 </head>
 
 <body data-page="about">
-  <div class="noise-overlay"></div>
 
-  <!-- ===== NAV ===== -->
   <nav id="nav">
     <div class="nav-inner">
       <a class="nav-logo" href="index.html">
@@ -391,7 +340,7 @@
       </a>
       <div class="nav-links">
         <a class="nav-link" data-page="home" href="index.html">Home</a>
-        <a class="nav-link" data-page="interpreter" href="interpreter.html">Interpreter</a>
+        <a class="nav-link interp-gate" data-page="interpreter" href="interpreter.html">Interpreter</a>
         <a class="nav-link active" data-page="about" href="about.html">About Us</a>
         <a class="nav-link" data-page="blog" href="blog.html">Blog</a>
       </div>
@@ -442,6 +391,9 @@
         </div>
         <a id="nav-signin" class="nav-auth" href="signin.html">Sign In</a>
         <button id="nav-signout" class="nav-auth" onclick="logout()" style="display:none">Sign Out</button>
+        <button id="nav-profile" onclick="toggleProfilePanel()" title="Profile" style="display:none">
+          <span id="nav-profile-initial">U</span>
+        </button>
         <button class="hamburger" onclick="toggleMob()">
           <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <line x1="3" y1="12" x2="21" y2="12" />
@@ -453,7 +405,6 @@
     </div>
   </nav>
 
-  <!-- Mobile menu -->
   <div id="mob-menu">
     <button class="mob-close" onclick="toggleMob()"><svg width="30" height="30" fill="none" stroke="white"
         stroke-width="2" viewBox="0 0 24 24">
@@ -461,7 +412,7 @@
         <line x1="6" y1="6" x2="18" y2="18" />
       </svg></button>
     <a class="mob-link" data-page="home" href="index.html">Home</a>
-    <a class="mob-link" data-page="interpreter" href="interpreter.html">Interpreter</a>
+    <a class="mob-link interp-gate" data-page="interpreter" href="interpreter.html">Interpreter</a>
     <a class="mob-link active" data-page="about" href="about.html">About Us</a>
     <a class="mob-link" data-page="blog" href="blog.html">Blog</a>
     <a id="mob-signin" class="mob-auth" href="signin.html">Sign In</a>
@@ -470,9 +421,8 @@
 
   <main>
 
-    <!-- ══ HERO ══════════════════════════════════════════════════ -->
     <section class="relative min-h-[75vh] flex items-end pb-16 pt-28 overflow-hidden bg-[#050505]">
-      <!-- Background image atmosphere -->
+      
       <div class="absolute inset-0 z-0 pointer-events-none">
         <div class="absolute inset-0 opacity-30 mix-blend-screen">
           <img src="https://framerusercontent.com/images/9zvwRJAavKKacVyhFCwHyXW1U.png?width=1536&height=1024" alt=""
@@ -481,7 +431,6 @@
         <div class="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/80 to-transparent z-10"></div>
       </div>
 
-      <!-- Floating glow orb -->
       <div class="absolute top-1/3 right-1/4 w-[500px] h-[500px] rounded-full pointer-events-none float-orb"
         style="background: radial-gradient(circle, rgba(232,77,28,0.12) 0%, transparent 70%); filter: blur(40px);">
       </div>
@@ -496,7 +445,6 @@
             </div>
           </div>
 
-          <!-- DynamicText heading — clean single-element ticker -->
           <style>
             .dyn-h1 {
               font-family: 'Playfair Display', serif;
@@ -505,16 +453,16 @@
               letter-spacing: -0.02em;
             }
 
-            /* Clip window — exactly one line tall, hides the entering/exiting word */
+            
             .dyn-clip {
               display: inline-block;
               overflow: hidden;
               vertical-align: bottom;
-              /* Height = 1 line of the current font. We'll set it via JS on load */
+              
               line-height: 1.05;
             }
 
-            /* The single word that slides */
+            
             .dyn-ticker {
               display: block;
               background: linear-gradient(135deg, #ff6b35, #f59e0b, #ff8c42);
@@ -522,7 +470,7 @@
               -webkit-text-fill-color: transparent;
               background-clip: text;
               white-space: nowrap;
-              /* Transition used for SMOOTH slides — overridden per phase by JS */
+              
               will-change: transform, opacity;
             }
           </style>
@@ -552,17 +500,17 @@
 
               let idx = 0;
 
-              /* Phase 1 — position the incoming word BELOW the clip without transition */
+              
               function enter(word) {
                 ticker.style.transition = 'none';
                 ticker.style.transform = 'translateY(105%)';
                 ticker.style.opacity = '0';
                 ticker.textContent = word;
 
-                /* Force a reflow so the browser registers the "from" state */
+                
                 void ticker.offsetHeight;
 
-                /* Phase 2 — slide up into view */
+                
                 ticker.style.transition = `transform ${ENTER_MS}ms cubic-bezier(0.22,1,0.36,1),`
                   + `opacity   ${ENTER_MS}ms ease-out`;
                 ticker.style.transform = 'translateY(0)';
@@ -571,10 +519,10 @@
                 const isFinal = idx === words.length - 1;
 
                 if (!isFinal) {
-                  /* Phase 3 — hold, then exit upward */
+                  
                   setTimeout(() => exit(), ENTER_MS + HOLD_MS);
                 } else {
-                  /* Final word settled — trigger the constellation */
+                  
                   setTimeout(() => {
                     if (window.startConstellation) window.startConstellation();
                   }, ENTER_MS + 120);
@@ -587,32 +535,32 @@
                 ticker.style.transform = 'translateY(-105%)';
                 ticker.style.opacity = '0';
 
-                /* After exit finishes, advance and enter the next word */
+                
                 setTimeout(() => {
                   idx++;
                   enter(words[idx]);
                 }, EXIT_MS);
               }
 
-              /* Kick off after the reveal animation settles (~900ms) */
+              
               setTimeout(() => enter(words[0]), 900);
             })();
           </script>
 
           <p class="reveal text-lg md:text-xl text-white/40 max-w-2xl font-light leading-relaxed mt-8"
             style="transition-delay: 180ms;">
-            We are on a mission to ensure that communication is recognized as a fundamental human right — accessible to
+            We are on a mission to ensure that communication is recognized as a fundamental human right, accessible to
             everyone, everywhere, without exception.
           </p>
         </div>
       </div>
-      <!-- ── Language Constellation Canvas ────────────────────── -->
+      
       <canvas id="lang-constellation" class="absolute inset-0 z-10 pointer-events-none"
         style="width:100%;height:100%;opacity:0;transition:opacity 1.4s cubic-bezier(0.22,1,0.36,1);"></canvas>
       <style>
         #lang-constellation {
           display: block;
-          /* Fade left edge — keeps constellation off the text */
+          
           -webkit-mask-image: linear-gradient(to right, transparent 0%, transparent 42%, rgba(0, 0, 0, 0.4) 50%, black 62%);
           mask-image: linear-gradient(to right, transparent 0%, transparent 42%, rgba(0, 0, 0, 0.4) 50%, black 62%);
         }
@@ -622,7 +570,7 @@
           var canvas = document.getElementById('lang-constellation');
           var ctx = canvas.getContext('2d');
 
-          /* ── Language script samples — one word each ── */
+          
           var scripts = [
             { text: '\u0633\u0644\u0627\u0645', lang: 'Arabic' },  // salam
             { text: '\u3053\u3093\u306b\u3061\u306f', lang: 'Japanese' },  // konnichiwa
@@ -636,7 +584,7 @@
             { text: '\u08af\u0631\u0648\u062f', lang: 'Kurdish' },  // dirud
           ];
 
-          /* ── Node definitions ── */
+          
           var nodes = [];
           var NUM_NODES = 9;
 
@@ -651,18 +599,18 @@
             var W = canvas.offsetWidth;
             var H = canvas.offsetHeight;
 
-            /* ── Distribute nodes broadly across the right half ── */
-            var LB = W * 0.52;   /* Clear the text on the left */
-            var RB = W * 0.94;   /* Stop before edge */
-            var T = H * 0.15;   /* Clear the nav */
-            var Bo = H * 0.85;   /* Clear the scroll indicator */
+            
+            var LB = W * 0.52;   
+            var RB = W * 0.94;   
+            var T = H * 0.15;   
+            var Bo = H * 0.85;   
 
             nodes = [];
-            /* Use more nodes for a fuller look, but keep them spread out */
+            
             var COUNT = 12;
             for (var i = 0; i < COUNT; i++) {
               nodes.push({
-                /* Spread nodes evenly across the defined zone */
+                
                 x: LB + Math.random() * (RB - LB),
                 y: T + Math.random() * (Bo - T),
                 vx: (Math.random() - 0.5) * 0.18,
@@ -682,8 +630,7 @@
             }
           }
 
-
-          /* ── Connection threshold ── */
+          
           var CONN_DIST = 200;
 
           var ORANGE = [232, 77, 28];
@@ -708,11 +655,11 @@
 
             ctx.clearRect(0, 0, W, H);
 
-            /* ── Move nodes ── */
+            
             nodes.forEach(function (n) {
               n.x += n.vx;
               n.y += n.vy;
-              // Soft-bounce — global zone walls
+
               var lb = n.leftBound || W * 0.52;
               var rb = n.rightBound || W * 0.94;
               var tb = n.topBound || H * 0.15;
@@ -722,7 +669,7 @@
               if (n.x > rb) { n.vx -= 0.015; }
               if (n.y < tb) { n.vy += 0.012; }
               if (n.y > bb) { n.vy -= 0.012; }
-              // Clamp speed
+
               n.vx = Math.max(-0.5, Math.min(0.5, n.vx));
               n.vy = Math.max(-0.5, Math.min(0.5, n.vy));
               n.pulseT += 0.018;
@@ -731,8 +678,7 @@
               n.labelAlpha += (n.labelTarget - n.labelAlpha) * 0.04;
             });
 
-
-            /* ── Draw connections ── */
+            
             for (var i = 0; i < nodes.length; i++) {
               for (var j = i + 1; j < nodes.length; j++) {
                 var a = nodes[i], b = nodes[j];
@@ -752,14 +698,14 @@
               }
             }
 
-            /* ── Draw nodes + labels ── */
+            
             nodes.forEach(function (n, i) {
               var pulse = 0.7 + 0.3 * Math.sin(n.pulseT);
               var t = i / nodes.length;
               var col = lerpColor(ORANGE, AMBER, t);
               var colStr = 'rgb(' + col[0] + ',' + col[1] + ',' + col[2] + ')';
 
-              /* Outer glow ring */
+              
               var glowR = n.r * 4 * pulse;
               var grd = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, glowR);
               grd.addColorStop(0, 'rgba(' + col[0] + ',' + col[1] + ',' + col[2] + ',' + (0.22 * pulse).toFixed(3) + ')');
@@ -769,7 +715,7 @@
               ctx.fillStyle = grd;
               ctx.fill();
 
-              /* Core dot */
+              
               ctx.beginPath();
               ctx.arc(n.x, n.y, n.r * pulse, 0, Math.PI * 2);
               ctx.fillStyle = colStr;
@@ -777,7 +723,7 @@
               ctx.fill();
               ctx.globalAlpha = 1;
 
-              /* Script label */
+              
               if (n.labelAlpha > 0.01) {
                 var script = scripts[n.textIdx];
                 ctx.save();
@@ -786,7 +732,7 @@
                 ctx.fillStyle = colStr;
                 ctx.textAlign = 'center';
                 ctx.fillText(script.text, n.x, n.y - n.r * 3 - 4);
-                /* tiny lang name below */
+                
                 ctx.font = '8px sans-serif';
                 ctx.fillStyle = 'rgba(' + col[0] + ',' + col[1] + ',' + col[2] + ',0.45)';
                 ctx.fillText(script.lang, n.x, n.y + n.r * 3 + 11);
@@ -795,16 +741,16 @@
             });
           }
 
-          /* ── Init: run rAF silently; reveal triggered externally ── */
+          
           new ResizeObserver(resize).observe(canvas);
           resize();
           requestAnimationFrame(frame);
 
-          /* Global hook called by the ticker when "Translation." settles */
+          
           window.startConstellation = function () {
-            /* Fade the canvas in */
+            
             canvas.style.opacity = '1';
-            /* Stagger the label reveals from this moment */
+            
             nodes.forEach(function (n, i) {
               n.showLabel = false;
               n.labelAlpha = 0;
@@ -816,19 +762,15 @@
 
       </script>
 
-
-      <!-- Scroll indicator -->
       <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-20">
         <span class="text-[9px] uppercase tracking-[0.4em] text-white/20 font-medium">Scroll</span>
         <div class="w-px h-12 bg-gradient-to-b from-transparent via-orange-600/40 to-transparent animate-pulse"></div>
       </div>
     </section>
 
-    <!-- ══ MISSION STATEMENT ════════════════════════════════════ -->
     <section id="about-mission" class="py-10 relative overflow-hidden bg-[#050505]"
       style="border-top:1px solid rgba(255,255,255,0.04);">
 
-      <!-- WebGL Bayer-dithering canvas (full section bg) -->
       <canvas id="dither-canvas" style="
         position:absolute; inset:0;
         width:100%; height:100%;
@@ -845,7 +787,7 @@
           const gl = canvas.getContext('webgl', { alpha: true, premultipliedAlpha: false });
           if (!gl) return;
 
-          /* ── Shaders ─────────────────────────────────────── */
+          
           const VS = `
             attribute vec2 a_pos;
             void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }
@@ -857,7 +799,7 @@
             uniform float u_speed;
             uniform vec2  u_res;
 
-            /* 4×4 Bayer threshold matrix (normalised to 0-1) */
+            
             float bayer4[16];
             void initBayer() {
               bayer4[0]  =  0.0/16.0; bayer4[1]  =  8.0/16.0;
@@ -870,7 +812,7 @@
               bayer4[14] = 13.0/16.0; bayer4[15] =  5.0/16.0;
             }
 
-            /* Hash noise — two-pass smooth */
+            
             float hash(vec2 p) {
               p = fract(p * vec2(234.34, 435.345));
               p += dot(p, p + 34.23);
@@ -886,7 +828,7 @@
               );
             }
 
-            /* Layered warp noise — matches paper-design "warp" shape */
+            
             float warpNoise(vec2 p, float t) {
               vec2 q = vec2(
                 noise(p + vec2(0.0, 0.0) + t * 0.12),
@@ -902,31 +844,31 @@
             void main() {
               initBayer();
 
-              /* UV in 0-1, corrected for aspect */
+              
               vec2 uv = gl_FragCoord.xy / u_res;
               float aspect = u_res.x / u_res.y;
               vec2 p = vec2(uv.x * aspect, uv.y);
 
               float t = u_time * u_speed;
 
-              /* Sample warp field at a coarse scale */
+              
               float n = warpNoise(p * 2.2, t);
 
-              /* Bayer threshold lookup — 4×4 tile */
+              
               int bx = int(mod(gl_FragCoord.x, 4.0));
               int by = int(mod(gl_FragCoord.y, 4.0));
               float threshold = bayer4[by * 4 + bx];
 
-              /* Dithered step */
+              
               float d = step(threshold, n);
 
-              /* Orange #EC4E02 */
+              
               vec3 col = vec3(0.925, 0.306, 0.008) * d;
               gl_FragColor = vec4(col, d * 0.9);
             }
           `;
 
-          /* ── Compile & link ───────────────────────────────── */
+          
           function compile(type, src) {
             const s = gl.createShader(type);
             gl.shaderSource(s, src); gl.compileShader(s);
@@ -937,7 +879,7 @@
           gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FS));
           gl.linkProgram(prog); gl.useProgram(prog);
 
-          /* Full-screen quad */
+          
           const buf = gl.createBuffer();
           gl.bindBuffer(gl.ARRAY_BUFFER, buf);
           gl.bufferData(gl.ARRAY_BUFFER,
@@ -953,13 +895,13 @@
           gl.enable(gl.BLEND);
           gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
-          /* ── Hover speed ──────────────────────────────────── */
+          
           const section = document.getElementById('about-mission');
           let targetSpeed = 0.2, currentSpeed = 0.2;
           section.addEventListener('mouseenter', () => targetSpeed = 0.6);
           section.addEventListener('mouseleave', () => targetSpeed = 0.2);
 
-          /* ── Resize ───────────────────────────────────────── */
+          
           function resize() {
             const rect = canvas.getBoundingClientRect();
             canvas.width = rect.width * devicePixelRatio;
@@ -969,13 +911,13 @@
           new ResizeObserver(resize).observe(canvas);
           resize();
 
-          /* ── Render loop ────────────────────────────────────── */
+          
           let start = null;
           function frame(ts) {
             if (!start) start = ts;
             const t = (ts - start) / 1000;
 
-            /* Smoothly lerp speed */
+            
             currentSpeed += (targetSpeed - currentSpeed) * 0.04;
 
             gl.clear(gl.COLOR_BUFFER_BIT);
@@ -989,7 +931,6 @@
         })();
       </script>
 
-      <!-- Gradient-border inner card -->
       <div class="container mx-auto px-6" style="position:relative;z-index:1;">
         <div class="max-w-4xl mx-auto reveal" style="
           padding: 2px;
@@ -1035,7 +976,6 @@
       </div>
     </section>
 
-    <!-- ══ VALUES ══════════════════════════════════════════════ -->
     <section id="about-values" class="py-20 bg-[#060300]"
       style="border-top: 1px solid rgba(255,255,255,0.04); scroll-margin-top: 80px;">
       <div class="container mx-auto px-6">
@@ -1138,16 +1078,14 @@
       </div>
     </section>
 
-    <!-- ══ HUMAN ELEMENT — Contributor Voices ══════════════════ -->
     <section class="py-20 bg-[#050505] relative overflow-hidden" style="border-top: 1px solid rgba(255,255,255,0.04);">
 
-      <!-- Ambient glow -->
       <div class="absolute inset-0 pointer-events-none"
         style="background: radial-gradient(ellipse 70% 60% at 60% 50%, rgba(232,77,28,0.07) 0%, transparent 70%);">
       </div>
 
       <style>
-        /* ── Contributor ring ── */
+        
         .contrib-ring-wrap {
           position: relative;
           width: 260px;
@@ -1182,7 +1120,7 @@
           stroke-dashoffset: 52;
         }
 
-        /* 720 * (1 - 0.928) — for 200/216 filled */
+        
         .contrib-center {
           position: absolute;
           inset: 0;
@@ -1211,7 +1149,7 @@
           margin-top: 4px;
         }
 
-        /* ── Voices ticker ── */
+        
         .voices-wrap {
           position: relative;
           overflow: hidden;
@@ -1300,7 +1238,7 @@
           letter-spacing: 0.05em;
         }
 
-        /* Progress dots */
+        
         .voice-dots {
           display: flex;
           gap: 6px;
@@ -1323,20 +1261,16 @@
 
       <div class="container mx-auto px-6 relative z-10">
 
-        <!-- Header -->
         <div class="reveal text-center mb-16">
           <div class="section-label justify-center mb-4">The Human Element</div>
           <h2 class="font-serif text-4xl md:text-6xl text-white/90">Technology built<br /><span
               class="italic font-light">with empathy.</span></h2>
         </div>
 
-        <!-- Split: ring + voices -->
         <div class="max-w-5xl mx-auto flex flex-col lg:flex-row items-center gap-16">
 
-          <!-- Left: Contributor ring + mini-stats -->
           <div class="flex flex-col items-center gap-8 reveal">
 
-            <!-- Animated donut ring -->
             <div class="contrib-ring-wrap" id="contrib-ring-wrap">
               <svg class="contrib-ring-svg" viewBox="0 0 260 260">
                 <defs>
@@ -1355,7 +1289,6 @@
               </div>
             </div>
 
-            <!-- Mini stats below ring -->
             <div class="grid grid-cols-2 gap-4 w-full max-w-[260px]">
               <div class="text-center p-4 rounded-2xl"
                 style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);">
@@ -1374,14 +1307,13 @@
             </div>
           </div>
 
-          <!-- Right: Rotating contributor voices -->
           <div class="flex-1 reveal" style="transition-delay:160ms">
             <div class="voices-wrap" id="voices-wrap">
 
               <div class="voice-card active">
                 <span class="voice-q">&ldquo;</span>
-                <p class="voice-text">I've been signing ISL for 32 years. Necho's model didn't just detect my gestures —
-                  it understood <em>how</em> I sign. That's a first.</p>
+                <p class="voice-text">I've been signing ISL for 32 years. Necho's model didn't just detect my gestures.
+                  It understood <em>how</em> I sign. That's a first.</p>
                 <div class="voice-who">
                   <div class="voice-avatar">R</div>
                   <div>
@@ -1420,7 +1352,7 @@
               <div class="voice-card">
                 <span class="voice-q">&ldquo;</span>
                 <p class="voice-text">I contributed 800 hours of gesture data. Knowing it powers real conversations for
-                  real people — that's not a small thing. That's everything.</p>
+                  real people. That's not a small thing. That's everything.</p>
                 <div class="voice-who">
                   <div class="voice-avatar">A</div>
                   <div>
@@ -1432,7 +1364,6 @@
 
             </div>
 
-            <!-- Dots + CTA -->
             <div class="flex items-center justify-between mt-6 flex-wrap gap-4">
               <div class="voice-dots" id="voice-dots"></div>
               <a href="interpreter.html"
@@ -1447,7 +1378,7 @@
 
       <script>
         (function () {
-          /* ── Contributor count-up ── */
+          
           var countEl = document.getElementById('contrib-count');
           var ringEl = document.getElementById('contrib-ring-fill');
           var wrap = document.getElementById('contrib-ring-wrap');
@@ -1469,7 +1400,7 @@
           }, { threshold: 0.4 });
           ro.observe(wrap);
 
-          /* ── Voice carousel ── */
+          
           var cards = document.querySelectorAll('#voices-wrap .voice-card');
           var dotsEl = document.getElementById('voice-dots');
           var cur = 0;
@@ -1491,20 +1422,15 @@
       </script>
     </section>
 
-    <!-- ══ VALUES ─ Fresh animated tilt-cards ══════════════════ -->
     <section class="py-20 relative overflow-hidden bg-[#050505]" style="border-top:1px solid rgba(255,255,255,0.04);">
 
-      <!-- Moving grain texture orbs -->
       <div class="absolute -top-40 -left-40 w-96 h-96 rounded-full pointer-events-none"
         style="background:radial-gradient(circle,rgba(232,77,28,0.08),transparent 70%);filter:blur(60px);"></div>
       <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full pointer-events-none"
         style="background:radial-gradient(circle,rgba(245,158,11,0.08),transparent 70%);filter:blur(60px);"></div>
 
       <style>
-        /* ────────────────────────────────────────────────
-           NECHO GLOW CARDS — Magnetic Edge Physics
-           Adapted from user React concept to Vanilla + Drag
-        ──────────────────────────────────────────────── */
+        
         @property --pointer-deg {
           syntax: "<angle>";
           initial-value: 0deg;
@@ -1522,7 +1448,7 @@
           user-select: none;
           touch-action: none;
           transition: border-color 0.3s, box-shadow 0.3s, background 0.4s;
-          /* Refined luxury variables */
+          
           --pointer-x: 50%;
           --pointer-y: 50%;
           --pointer-d: 0;
@@ -1611,7 +1537,6 @@
 
       <div class="container mx-auto px-6 relative z-10">
 
-        <!-- Header -->
         <div class="reveal text-center mb-16">
           <div class="section-label justify-center mb-4">Our Values</div>
           <h2 class="font-serif text-4xl md:text-6xl text-white/90">Principles that<br /><span
@@ -1621,7 +1546,7 @@
 
         <div class="val-grid" id="val-drag-area">
           <div class="val-grid" id="val-drag-area">
-            <!-- Card 1 -->
+            
             <div class="val-card reveal">
               <div class="val-card-bg-mesh"></div>
               <div class="val-card-content">
@@ -1632,7 +1557,6 @@
               </div>
             </div>
 
-            <!-- Card 2 -->
             <div class="val-card reveal" style="transition-delay:50ms">
               <div class="val-card-bg-mesh"></div>
               <div class="val-card-content">
@@ -1642,7 +1566,6 @@
               </div>
             </div>
 
-            <!-- Card 3 -->
             <div class="val-card reveal" style="transition-delay:100ms">
               <div class="val-card-bg-mesh"></div>
               <div class="val-card-content">
@@ -1652,7 +1575,6 @@
               </div>
             </div>
 
-            <!-- Card 4 -->
             <div class="val-card reveal" style="transition-delay:150ms">
               <div class="val-card-bg-mesh"></div>
               <div class="val-card-content">
@@ -1662,7 +1584,6 @@
               </div>
             </div>
 
-            <!-- Card 5 -->
             <div class="val-card reveal" style="transition-delay:200ms">
               <div class="val-card-bg-mesh"></div>
               <div class="val-card-content">
@@ -1672,7 +1593,6 @@
               </div>
             </div>
 
-            <!-- Card 6 -->
             <div class="val-card reveal" style="transition-delay:250ms">
               <div class="val-card-bg-mesh"></div>
               <div class="val-card-content">
@@ -1707,11 +1627,9 @@
               const dx = x - cx;
               const dy = y - cy;
 
-              // Angle
               let angle = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
               if (angle < 0) angle += 360;
 
-              // Closeness to edge
               const kx = cx / Math.abs(dx || 0.1);
               const ky = cy / Math.abs(dy || 0.1);
               const edge = Math.min(1, 1 / Math.min(kx, ky));
@@ -1736,7 +1654,6 @@
 
             card.addEventListener('pointermove', updatePointerProps);
 
-            // Intro animation "scan"
             const playIntro = () => {
               const startAngle = 110;
               const endAngle = 470;
@@ -1787,7 +1704,6 @@
       </script>
     </section>
 
-    <!-- ══ TEAM ══════════════════════════════════════════════════ -->
     <section class="py-20 bg-[#050505]" style="border-top: 1px solid rgba(255,255,255,0.04);">
       <div class="container mx-auto px-6">
         <div class="reveal text-center mb-10">
@@ -1798,70 +1714,63 @@
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-          <!-- Member 1 -->
+          
           <div class="team-card reveal">
             <div class="overflow-hidden" style="aspect-ratio: 3/4; border-radius: 2rem 2rem 0 0;">
               <img class="team-avatar w-full h-full"
-                src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=400&auto=format&fit=crop&crop=face"
-                alt="Priya Sharma" />
+                src="https://hmidvlypfhbjefhcwwkt.supabase.co/storage/v1/object/public/images/d1c39160-75d0-407e-ad0e-d83bebb1278d/8bb6d5bc-5279-498b-9183-d2ed1d5ff464.png"
+                alt="Sree Ram S" />
             </div>
             <div class="p-5">
-              <p class="text-white/85 font-semibold text-sm">Priya Sharma</p>
-              <p class="text-orange-500/70 text-xs tracking-wider uppercase mt-0.5">Co-Founder & CEO</p>
-              <p class="text-white/30 text-xs font-light mt-3 leading-relaxed">Former Google AI researcher, ISL native
-                signer.</p>
+              <p class="text-white/85 font-semibold text-sm">Sree Ram S</p>
+              <p class="text-orange-500/70 text-xs tracking-wider uppercase mt-0.5">Founder</p>
+              <p class="text-white/30 text-xs font-light mt-3 leading-relaxed">Leads the mission of inclusive communication.</p>
             </div>
           </div>
 
-          <!-- Member 2 -->
           <div class="team-card reveal" style="transition-delay:80ms">
             <div class="overflow-hidden" style="aspect-ratio: 3/4; border-radius: 2rem 2rem 0 0;">
               <img class="team-avatar w-full h-full"
-                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop&crop=face"
-                alt="Dev Kapoor" />
+                src="https://hmidvlypfhbjefhcwwkt.supabase.co/storage/v1/object/public/images/d1c39160-75d0-407e-ad0e-d83bebb1278d/77acef4d-8928-46db-83bc-e35faedfa83b.jpeg?q=80&w=400&auto=format&fit=crop&crop=face"
+                alt="Rohtih R" />
             </div>
             <div class="p-5">
-              <p class="text-white/85 font-semibold text-sm">Dev Kapoor</p>
-              <p class="text-orange-500/70 text-xs tracking-wider uppercase mt-0.5">CTO & Co-Founder</p>
-              <p class="text-white/30 text-xs font-light mt-3 leading-relaxed">Neural architecture specialist. ML
-                systems at scale.</p>
+              <p class="text-white/85 font-semibold text-sm">Rohtih R</p>
+              <p class="text-orange-500/70 text-xs tracking-wider uppercase mt-0.5">CEO</p>
+              <p class="text-white/30 text-xs font-light mt-3 leading-relaxed">Helps build the vision of accessible communication.</p>
             </div>
           </div>
 
-          <!-- Member 3 -->
           <div class="team-card reveal" style="transition-delay:160ms">
             <div class="overflow-hidden" style="aspect-ratio: 3/4; border-radius: 2rem 2rem 0 0;">
               <img class="team-avatar w-full h-full"
-                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400&auto=format&fit=crop&crop=face"
-                alt="Elena West" />
+                src="https://hmidvlypfhbjefhcwwkt.supabase.co/storage/v1/object/public/images/d1c39160-75d0-407e-ad0e-d83bebb1278d/57b22c0f-dcac-497a-8309-58032d87c5b3.png?q=80&w=400&auto=format&fit=crop&crop=face"
+                alt="Prakash T" />
             </div>
             <div class="p-5">
-              <p class="text-white/85 font-semibold text-sm">Elena West</p>
+              <p class="text-white/85 font-semibold text-sm">Prakash T</p>
               <p class="text-orange-500/70 text-xs tracking-wider uppercase mt-0.5">Head of Accessibility</p>
               <p class="text-white/30 text-xs font-light mt-3 leading-relaxed">BSL certified interpreter with 12 years
                 in assistive tech.</p>
             </div>
           </div>
 
-          <!-- Member 4 -->
           <div class="team-card reveal" style="transition-delay:240ms">
             <div class="overflow-hidden" style="aspect-ratio: 3/4; border-radius: 2rem 2rem 0 0;">
               <img class="team-avatar w-full h-full"
-                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400&auto=format&fit=crop&crop=face"
-                alt="Aryan Mehta" />
+                src="https://hmidvlypfhbjefhcwwkt.supabase.co/storage/v1/object/public/images/d1c39160-75d0-407e-ad0e-d83bebb1278d/9fc2379b-5cd1-477e-baca-b5484ef6150f.jpeg?q=80&w=400&auto=format&fit=crop&crop=face"
+                alt="Samuvel J" />
             </div>
             <div class="p-5">
               <p class="text-white/85 font-semibold text-sm">Aryan Mehta</p>
               <p class="text-orange-500/70 text-xs tracking-wider uppercase mt-0.5">VP of Research</p>
-              <p class="text-white/30 text-xs font-light mt-3 leading-relaxed">Published researcher in computational
-                linguistics & CV.</p>
+              <p class="text-white/30 text-xs font-light mt-3 leading-relaxed">Develops the technology for sign language solutions.</p>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ══ CTA ═══════════════════════════════════════════════════ -->
     <section class="py-20 relative overflow-hidden bg-[#050505]" style="border-top: 1px solid rgba(232,77,28,0.1);">
       <div class="absolute inset-0 pointer-events-none"
         style="background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(232,77,28,0.1) 0%, transparent 70%);"></div>
@@ -1873,7 +1782,7 @@
           </h2>
           <p class="text-white/35 font-light leading-relaxed max-w-xl mx-auto mb-12">
             Whether you're a researcher, a signer, an educator, or simply someone who believes in a world without
-            communication barriers — there's a place for you here.
+            communication barriers. There's a place for you here.
           </p>
           <a href="signup.html"
             class="inline-flex items-center gap-3 px-10 py-4 rounded-full font-semibold text-sm tracking-wide text-white"
@@ -1887,13 +1796,8 @@
 
   </main>
 
-  <!-- ===== FOOTER ===== -->
   <footer>
-    <!--
-    <div class="overflow-hidden mb-12 -mx-4 select-none pointer-events-none">
-       <h2 class="text-[12vw] leading-[0.85] tracking-tighter text-white/[0.04] font-bold whitespace-nowrap">NECHO.</h2>
-    </div>
-    -->
+    
     <div class="footer-grid">
       <div><img src="logo.svg" alt="Necho" class="footer-logo-img" />
         <p class="footer-desc">Universal communication through neural interpretation and inclusive design on a global
@@ -1901,18 +1805,13 @@
       </div>
       <div>
         <div class="footer-col-h">Platform</div>
-        <div class="footer-lnks"><a class="footer-lnk" href="interpreter.html">Interpreter</a><a class="footer-lnk"
+        <div class="footer-lnks"><a class="footer-lnk interp-gate" href="interpreter.html" style="display:none">Interpreter</a><a class="footer-lnk"
             href="blog.html">Blog &amp; Insights</a></div>
       </div>
       <div>
         <div class="footer-col-h">Company</div>
         <div class="footer-lnks"><a class="footer-lnk" href="about.html">About Us</a><a class="footer-lnk"
             href="privacy.html">Privacy Policy</a><a class="footer-lnk" href="terms.html">Terms of Service</a></div>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-start;gap:1rem;">
-        <button id="footer-admin-btn" class="footer-admin" onclick="activateAdmin()">
-          <div class="footer-admin-dot pulse"></div>Administrative Portal
-        </button>
       </div>
     </div>
     <div class="footer-bottom">
@@ -1921,34 +1820,14 @@
     </div>
   </footer>
 
-  <!-- Theme btn -->
-  <button id="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme">
-    <svg id="icon-sun" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-      <circle cx="12" cy="12" r="4" />
-      <line x1="12" y1="2" x2="12" y2="4" />
-      <line x1="12" y1="20" x2="12" y2="22" />
-      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-      <line x1="2" y1="12" x2="4" y2="12" />
-      <line x1="20" y1="12" x2="22" y2="12" />
-      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-    </svg>
-    <svg id="icon-moon" style="display:none" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"
-      viewBox="0 0 24 24">
-      <path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-    </svg>
-  </button>
-
   <script src="nav.js"></script>
+  <script type="module" src="firebase-nav.js"></script>
   <script>
-    // Reveal observer
     const ro = new IntersectionObserver((entries) => {
       entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('active'); ro.unobserve(e.target); } });
     }, { threshold: 0.04, rootMargin: '0px' });
     document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
 
-    // Navbar scroll
     const navEl = document.getElementById('nav');
     let ticking = false;
     window.addEventListener('scroll', () => {

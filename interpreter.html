@@ -3,11 +3,10 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Interpreter — Necho</title>
+  <title>Interpreter - Necho</title>
   <link rel="stylesheet" href="style.css"/>
   <link rel="stylesheet" href="interpreter.css"/>
   <style>
-    /* ── Chat messages ─────────────────────────────────────────── */
     .chat-msg {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -35,7 +34,6 @@
     .msg-meta        { font-size: 11px; opacity: .4; font-family: monospace; }
     .msg-auto-badge  { font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 4px; background: rgba(255,255,255,.07); letter-spacing: .5px; text-transform: uppercase; }
 
-    /* ── Live transcript bubble ────────────────────────────────── */
     .live-transcript {
       display: flex; align-items: center; gap: 9px;
       padding: 9px 13px; border-radius: 10px;
@@ -45,7 +43,6 @@
     .lt-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-2); flex-shrink: 0; animation: blink 1s infinite; }
     @keyframes blink { 0%,100%{ opacity:1; } 50%{ opacity:.25; } }
 
-    /* ── Clear button ──────────────────────────────────────────── */
     .btn-clear {
       display: inline-flex; align-items: center; gap: 5px;
       padding: 6px 12px; border-radius: 8px; font-size: 12px;
@@ -55,7 +52,6 @@
     }
     .btn-clear:hover { border-color: var(--accent); color: var(--accent); background: rgba(232,77,28,.07); }
 
-    /* ── Video box + offline overlay ───────────────────────────── */
     .video-box { position: relative; }
     .video-offline {
       position: absolute; inset: 0; display: none;
@@ -66,16 +62,13 @@
     }
     .video-offline code { font-family: monospace; background: rgba(255,255,255,.07); padding: 2px 8px; border-radius: 5px; font-size: 12px; }
 
-    /* ── Panel head ────────────────────────────────────────────── */
     .panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 8px; }
 
-    /* ── Toast animation ───────────────────────────────────────── */
     @keyframes toastIn {
       from { opacity: 0; transform: translateX(-50%) translateY(8px); }
       to   { opacity: 1; transform: translateX(-50%) translateY(0); }
     }
 
-    /* ── Session modal ─────────────────────────────────────────── */
     .session-overlay {
       position: fixed; inset: 0; z-index: 9999;
       background: rgba(5,5,5,0.92); backdrop-filter: blur(16px);
@@ -120,7 +113,6 @@
     }
     .session-start:hover { opacity: 0.9; transform: translateY(-1px); }
 
-    /* ── Connection badge states ────────────────────────────────── */
     .live-badge.badge-connecting {
       background: rgba(239,68,68,0.1) !important;
       border-color: rgba(239,68,68,0.25) !important;
@@ -137,7 +129,15 @@
 </head>
 <body data-page="interpreter">
 
-<!-- ===== SESSION SETUP MODAL ===== -->
+<div id="interp-access-overlay" style="position:fixed;inset:0;z-index:9998;background:rgba(5,5,5,0.97);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.25rem;text-align:center;padding:2rem;">
+  <div style="width:56px;height:56px;border-radius:50%;background:rgba(232,77,28,0.1);border:1px solid rgba(232,77,28,0.25);display:flex;align-items:center;justify-content:center;">
+    <svg width="24" height="24" fill="none" stroke="rgba(232,77,28,0.8)" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+  </div>
+  <h2 id="interp-access-title" style="color:rgba(255,255,255,0.9);font-size:1.4rem;font-weight:700;letter-spacing:-0.02em;">Interpreter Access Required</h2>
+  <p id="interp-access-msg" style="color:rgba(255,255,255,0.35);max-width:380px;line-height:1.75;font-size:0.95rem;">Please sign in to check if you have access. The interpreter is currently invite-only while we refine the ISL model.</p>
+  <a href="signin.html" id="interp-signin-link" style="background:linear-gradient(135deg,#e84d1c,#f59e0b);color:white;padding:11px 32px;border-radius:999px;font-weight:600;text-decoration:none;font-size:13px;letter-spacing:0.05em;">Sign In</a>
+</div>
+
 <div id="session-overlay" class="session-overlay">
   <div class="session-modal">
     <div class="session-modal-header">
@@ -160,7 +160,6 @@
   </div>
 </div>
 
-<!-- ===== NAV ===== -->
 <nav id="nav">
   <div class="nav-inner">
     <a class="nav-logo" href="index.html">
@@ -168,7 +167,7 @@
     </a>
     <div class="nav-links">
       <a class="nav-link"        data-page="home"        href="index.html">Home</a>
-      <a class="nav-link active" data-page="interpreter" href="interpreter.html">Interpreter</a>
+      <a class="nav-link active interp-gate" data-page="interpreter" href="interpreter.html">Interpreter</a>
       <a class="nav-link"        data-page="about"       href="about.html">About Us</a>
       <a class="nav-link"        data-page="blog"        href="blog.html">Blog</a>
     </div>
@@ -207,6 +206,9 @@
       </div>
       <a id="nav-signin"  class="nav-auth" href="signin.html">Sign In</a>
       <button id="nav-signout" class="nav-auth" onclick="logout()" style="display:none">Sign Out</button>
+      <button id="nav-profile" onclick="toggleProfilePanel()" title="Profile" style="display:none">
+        <span id="nav-profile-initial">U</span>
+      </button>
       <button class="hamburger" onclick="toggleMob()">
         <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
@@ -217,17 +219,22 @@
 <div id="mob-menu">
   <button class="mob-close" onclick="toggleMob()"><svg width="30" height="30" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
   <a class="mob-link"        data-page="home"        href="index.html">Home</a>
-  <a class="mob-link active" data-page="interpreter" href="interpreter.html">Interpreter</a>
+  <a class="mob-link active interp-gate" data-page="interpreter" href="interpreter.html">Interpreter</a>
   <a class="mob-link"        data-page="about"       href="about.html">About Us</a>
   <a class="mob-link"        data-page="blog"        href="blog.html">Blog</a>
   <a id="mob-signin"  class="mob-auth" href="signin.html">Sign In</a>
   <button id="mob-signout" class="mob-auth" onclick="logout()" style="display:none">Sign Out</button>
 </div>
 
-<!-- ===== MAIN ===== -->
+<div style="padding: 84px 1.5rem 0; display: flex; align-items: center; gap: 12px;">
+  <a href="index.html" style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:999px;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.55);font-size:13px;font-weight:500;text-decoration:none;transition:all 0.2s;background:rgba(255,255,255,0.03);" onmouseover="this.style.color='rgba(255,255,255,0.9)';this.style.borderColor='rgba(232,77,28,0.4)'" onmouseout="this.style.color='rgba(255,255,255,0.55)';this.style.borderColor='rgba(255,255,255,0.1)'">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to Home
+  </a>
+</div>
+
 <main class="interp-main">
 
-  <!-- ── Left: Camera + Status ── -->
   <section class="interp-card">
     <div class="panel-head">
       <div class="panel-title">
@@ -242,12 +249,11 @@
       </div>
     </div>
 
-    <!-- Server MJPEG stream from local Flask backend -->
     <div class="video-box">
       <img id="video-feed" src="http://localhost:5000/video_feed" alt="Camera Feed"/>
       <div class="video-offline" id="video-offline">
         <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="opacity:.35"><path d="M15 10l4.553-2.069A1 1 0 0121 8.882v6.236a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
-        <p>Backend unavailable<br/><small>Run <code>testcap.py</code> to start the server</small></p>
+        <p>Backend unavailable<br/><small>Run <code>python local_backend.py</code> to start the server</small></p>
       </div>
       <div class="video-cam-off" id="video-cam-off">
         <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="opacity:.35"><path d="M15 10l4.553-2.069A1 1 0 0121 8.882v6.236a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/><line x1="2" y1="2" x2="22" y2="22" stroke-width="2"/></svg>
@@ -255,7 +261,6 @@
       </div>
     </div>
 
-    <!-- Camera + Mic controls -->
     <div class="cam-controls">
       <button id="cam-btn" class="btn-cam-ctrl ctrl-on" onclick="toggleCamera()">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 10l4.553-2.069A1 1 0 0121 8.882v6.236a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
@@ -264,6 +269,10 @@
       <button id="cam-mic-btn" class="btn-cam-ctrl" onclick="toggleMic()" title="Voice input (Chrome/Edge)">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0014 0M12 19v3M9 22h6"/></svg>
         Mic
+      </button>
+      <button id="tts-btn" class="btn-cam-ctrl ctrl-on" onclick="toggleTTS()" title="Voice output on">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+        Speak
       </button>
     </div>
 
@@ -274,11 +283,11 @@
       </div>
       <div class="status-row">
         <span class="status-key">Gesture</span>
-        <span id="gesture-val" class="status-val">—</span>
+        <span id="gesture-val" class="status-val">-</span>
       </div>
       <div class="status-row">
         <span class="status-key">Confidence</span>
-        <span id="conf-val" class="status-val">—</span>
+        <span id="conf-val" class="status-val">-</span>
       </div>
     </div>
 
@@ -288,7 +297,6 @@
     </button>
   </section>
 
-  <!-- ── Right: Conversation ── -->
   <section class="interp-card">
     <div class="panel-head">
       <div class="panel-title">
@@ -310,7 +318,6 @@
       </div>
     </div>
 
-    <!-- Live voice transcript bubble -->
     <div class="live-transcript" id="live-transcript" style="display:none">
       <div class="lt-dot"></div>
       <span id="lt-text">Listening…</span>
@@ -334,30 +341,106 @@
 </main>
 
 
-<!-- ── Theme toggle ── -->
-<button id="theme-btn" onclick="toggleTheme()">
-  <svg id="icon-sun" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-  <svg id="icon-moon" style="display:none" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-</button>
 
 <script src="nav.js"></script>
+<script type="module" src="firebase-nav.js"></script>
 <script>
-/* ─────────────────────────────────────────────────────────────────────────────
-   Necho Interpreter — all logic embedded to avoid ReferenceError issues
-───────────────────────────────────────────────────────────────────────────── */
+window._syncInterpreter = function() {
+  const overlay = document.getElementById('interp-access-overlay');
+  const signinLink = document.getElementById('interp-signin-link');
+  const title = document.getElementById('interp-access-title');
+  const msg = document.getElementById('interp-access-msg');
+  if (!overlay) return;
+
+  if (!window.App.isLoggedIn) {
+    overlay.style.display = 'flex';
+    if (title) title.textContent = 'Sign In to Access the Interpreter';
+    if (msg) msg.textContent = 'The Necho interpreter is currently invite-only. Please sign in and we\'ll check if you have access.';
+    if (signinLink) signinLink.style.display = '';
+  } else if (!window.App.isInterpreterAllowed) {
+    overlay.style.display = 'flex';
+    if (title) title.textContent = 'Access Not Yet Granted';
+    if (msg) msg.textContent = 'You\'re signed in, but your account hasn\'t been approved for the interpreter yet. We\'re rolling out access gradually, reach out to us and we\'ll get you set up.';
+    if (signinLink) { signinLink.textContent = 'Contact Us'; signinLink.href = 'mailto:hello@necho.ai'; }
+  } else {
+    overlay.style.display = 'none';
+  }
+};
+</script>
+<script>
 'use strict';
 
 const API = 'http://localhost:5000';
 
-// ── State ──────────────────────────────────────────────────────────────────
 let lastCount      = 0;
 let atBottom       = true;
 let isOnline       = false;
 let isListening    = false;
 let cameraEnabled  = true;
 let recognition    = null;
+let ttsEnabled     = true;
+let sessionStarted = false;
 
-// ── Session participants ────────────────────────────────────────────────────
+var _lastVoiceText = '';
+var _lastVoiceTime = 0;
+
+var TTS_LANG = { en:'en-US', hi:'hi-IN', ta:'ta-IN', te:'te-IN', kn:'kn-IN', ml:'ml-IN', mr:'mr-IN', gu:'gu-IN' };
+
+var _voiceCache = {};
+
+if (window.speechSynthesis) {
+  window.speechSynthesis.onvoiceschanged = function() { _voiceCache = {}; };
+}
+
+function _pickVoice(lang) {
+  if (_voiceCache[lang] !== undefined) return _voiceCache[lang];
+  var voices = window.speechSynthesis.getVoices();
+  if (!voices.length) return (_voiceCache[lang] = null);
+
+  var root  = lang.split('-')[0];
+  var exact = voices.filter(function(v) { return v.lang === lang; });
+  var pool  = exact.length ? exact : voices.filter(function(v) { return v.lang.startsWith(root); });
+  if (!pool.length) pool = voices; // last resort: any voice
+
+  var google = pool.filter(function(v) { return /google/i.test(v.name); });
+  if (google.length) return (_voiceCache[lang] = google[0]);
+
+  var premium = pool.filter(function(v) { return /enhanced|premium|natural|neural/i.test(v.name); });
+  if (premium.length) return (_voiceCache[lang] = premium[0]);
+
+  return (_voiceCache[lang] = pool[0] || null);
+}
+
+function speak(text) {
+  if (!ttsEnabled || !text || !window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var u    = new SpeechSynthesisUtterance(String(text));
+  var sel  = document.getElementById('lang-select');
+  var lang = TTS_LANG[(sel && sel.value) || 'en'] || 'en-US';
+  u.lang   = lang;
+  u.rate   = 0.92;
+  u.pitch  = 1.0;
+  var v = _pickVoice(lang);
+  if (v) u.voice = v;
+  window.speechSynthesis.speak(u);
+}
+
+var SPEAK_ON_SVG  = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>';
+var SPEAK_OFF_SVG = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>';
+
+function toggleTTS() {
+  ttsEnabled = !ttsEnabled;
+  if (!ttsEnabled) window.speechSynthesis && window.speechSynthesis.cancel();
+  var btn = document.getElementById('tts-btn');
+  if (btn) {
+    btn.innerHTML = (ttsEnabled ? SPEAK_ON_SVG : SPEAK_OFF_SVG) + (ttsEnabled ? ' Speak' : ' Muted');
+    btn.classList.toggle('ctrl-on',  ttsEnabled);
+    btn.classList.toggle('ctrl-off', !ttsEnabled);
+    btn.title = ttsEnabled ? 'Voice output on' : 'Voice output off';
+  }
+  showToast(ttsEnabled ? 'Voice output on' : 'Voice output off', ttsEnabled ? 'green' : 'info');
+}
+
 let speakerName   = 'Speaker';
 let disabledName  = 'Signer';
 
@@ -365,36 +448,36 @@ function startSession() {
   var sn = (document.getElementById('speaker-name-input').value || '').trim();
   var dn = (document.getElementById('disabled-name-input').value || '').trim();
   if (!sn || !dn) {
-    // highlight empty fields
     if (!sn) document.getElementById('speaker-name-input').style.borderColor = '#ef4444';
     if (!dn) document.getElementById('disabled-name-input').style.borderColor = '#ef4444';
     return;
   }
   speakerName  = sn;
   disabledName = dn;
-  var overlay = document.getElementById('session-overlay');
-  if (overlay) overlay.style.display = 'none';
+  fetch(API + '/clear_conversation', { method: 'POST' })
+    .catch(function() {})
+    .finally(function() {
+      lastCount = 0;
+      sessionStarted = true;
+      renderChat([]);
+      var overlay = document.getElementById('session-overlay');
+      if (overlay) overlay.style.display = 'none';
+    });
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   Boot — runs after DOM is ready
-───────────────────────────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
-  // Wire up the MJPEG img — show overlay if stream can't load
   var videoImg = document.getElementById('video-feed');
   if (videoImg) {
     videoImg.onload  = function() { showVideoOnline(); };
     videoImg.onerror = function() { showVideoOffline(); };
   }
 
-  // Disable mic button if browser doesn't support Web Speech API
   const hasSR = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
   if (!hasSR) {
     const mb = document.getElementById('cam-mic-btn');
     if (mb) { mb.disabled = true; mb.title = 'Needs Chrome or Edge'; }
   }
 
-  // Track scroll so we don't force-scroll when user reads old messages
   const chatBox = document.getElementById('chat-box');
   if (chatBox) {
     chatBox.addEventListener('scroll', () => {
@@ -402,16 +485,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Start polling
   pollStatus();
   pollConversation();
 });
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   Video feed helpers — MJPEG stream served by local Flask backend
-───────────────────────────────────────────────────────────────────────────── */
 function showVideoOffline() {
-  if (!cameraEnabled) return; // user-disabled camera takes precedence
+  if (!cameraEnabled) return;
   var feed    = document.getElementById('video-feed');
   var overlay = document.getElementById('video-offline');
   if (feed)    feed.style.display    = 'none';
@@ -419,16 +498,13 @@ function showVideoOffline() {
 }
 
 function showVideoOnline() {
-  if (!cameraEnabled) return; // user-disabled camera takes precedence
+  if (!cameraEnabled) return;
   var feed    = document.getElementById('video-feed');
   var overlay = document.getElementById('video-offline');
   if (feed)    feed.style.display    = 'block';
   if (overlay) overlay.style.display = 'none';
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   Camera enable / disable
-───────────────────────────────────────────────────────────────────────────── */
 var CAM_ON_SVG  = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 10l4.553-2.069A1 1 0 0121 8.882v6.236a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>';
 var CAM_OFF_SVG = '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 10l4.553-2.069A1 1 0 0121 8.882v6.236a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/><line x1="2" y1="2" x2="22" y2="22" stroke-width="2"/></svg>';
 
@@ -452,9 +528,6 @@ function toggleCamera() {
   }
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   Online / offline UI state
-───────────────────────────────────────────────────────────────────────────── */
 function setOnline(online) {
   if (online === isOnline) return;
   isOnline = online;
@@ -472,7 +545,7 @@ function setOnline(online) {
   if (hud) hud.style.borderColor = online ? '' : 'rgba(255,107,138,.4)';
   if (sub) sub.textContent = online
     ? 'Secure Handshake Established'
-    : 'localhost:5000 offline — run testcap.py';
+    : 'Interpreter is offline.';
 
   if (online) {
     showVideoOnline();
@@ -481,30 +554,23 @@ function setOnline(online) {
   }
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   Status polling — GET /status  (~4 fps)
-   The local backend processes the camera itself; we just read the result.
-───────────────────────────────────────────────────────────────────────────── */
 function pollStatus() {
   fetch(API + '/status')
     .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
     .then(function(d) {
       setOnline(true);
 
-      // Hand status
       var hs = document.getElementById('hand-status');
       if (hs) {
         hs.textContent = d.hand_detected ? 'Detected' : 'No Hand';
         hs.className   = 'status-val ' + (d.hand_detected ? 'status-yes' : 'status-no');
       }
 
-      // Gesture + confidence
       var gv = document.getElementById('gesture-val');
       var cv = document.getElementById('conf-val');
-      if (gv) gv.textContent = d.gesture || '—';
-      if (cv) cv.textContent = d.gesture ? (d.confidence * 100).toFixed(1) + '%' : '—';
+      if (gv) gv.textContent = d.gesture || '-';
+      if (cv) cv.textContent = d.gesture ? (d.confidence * 100).toFixed(1) + '%' : '-';
 
-      // Add Gesture button
       var btn = document.getElementById('add-gesture-btn');
       if (btn) {
         btn.disabled = !d.gesture;
@@ -516,14 +582,16 @@ function pollStatus() {
     .finally(function() { setTimeout(pollStatus, 250); });
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   Polling — /get_conversation  (every 600 ms)
-───────────────────────────────────────────────────────────────────────────── */
 function pollConversation() {
   fetch(API + '/get_conversation')
     .then(function(r) { return r.json(); })
     .then(function(data) {
       if (data.length !== lastCount) {
+        data.slice(lastCount).forEach(function(entry) {
+          if (sessionStarted && entry && entry.content && entry.type !== 'voice') {
+            speak(entry.content);
+          }
+        });
         lastCount = data.length;
         renderChat(data);
       }
@@ -532,9 +600,6 @@ function pollConversation() {
     .finally(function() { setTimeout(pollConversation, 600); });
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   Chat rendering
-───────────────────────────────────────────────────────────────────────────── */
 function renderChat(data) {
   var box   = document.getElementById('chat-box');
   var empty = document.getElementById('chat-empty');
@@ -575,7 +640,6 @@ function buildMessage(e) {
     tagClass = 'msg-tag-text';  icon = '✏️';
   }
 
-  // Determine sender name based on message type
   var senderName = e.type === 'gesture' ? disabledName : speakerName;
 
   article.innerHTML =
@@ -590,14 +654,11 @@ function buildMessage(e) {
   return article;
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   Actions
-───────────────────────────────────────────────────────────────────────────── */
 function addGesture() {
   fetch(API + '/add_gesture', { method: 'POST' })
     .then(function(r) { return r.json(); })
     .then(function(d) { if (!d.success) showToast(d.message || 'No gesture detected', 'warn'); })
-    .catch(function() { showToast('Cannot reach backend — is app.py running?', 'error'); });
+    .catch(function() { showToast('Cannot reach backend. Is app.py running?', 'error'); });
 }
 
 function sendMessage() {
@@ -623,9 +684,6 @@ function exportChat() {
   window.location.href = API + '/export';
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   Voice input (Chrome / Edge only)
-───────────────────────────────────────────────────────────────────────────── */
 function toggleMic() {
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) { showToast('Voice input needs Chrome or Edge', 'warn'); return; }
@@ -649,13 +707,16 @@ function startMic() {
       var r = event.results[i];
       if (r.isFinal) {
         var txt = r[0].transcript.trim();
-        if (txt) {
+        var now = Date.now();
+        if (txt && !(txt === _lastVoiceText && now - _lastVoiceTime < 3000)) {
+          _lastVoiceText = txt;
+          _lastVoiceTime = now;
           fetch(API + '/send_message', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: txt, type: 'voice' }),
           });
-          showLiveTranscript('');
         }
+        showLiveTranscript('');
       } else { interim += r[0].transcript; }
     }
     if (interim) showLiveTranscript(interim);
@@ -666,7 +727,6 @@ function startMic() {
   recognition.onerror = function(ev) {
     if (ev.error === 'no-speech') return;
     if (ev.error === 'network' && _netRetries < 3) {
-      // Chrome sometimes throws network on first attempt — retry silently
       _netRetries++;
       setTimeout(function() { try { recognition.start(); } catch(e) {} }, 500);
       return;
@@ -685,7 +745,10 @@ function startMic() {
 
   recognition.onend = function() {
     if (isListening) {
-      setTimeout(function() { try { recognition.start(); } catch(e) {} }, 150);
+      setTimeout(function() {
+        recognition = null;
+        startMic();
+      }, 150);
     } else { setMicUI(false); }
   };
 
@@ -720,7 +783,7 @@ function setMicUI(on) {
     btn.title = on ? 'Stop listening' : 'Voice input (Chrome/Edge)';
   }
   if (inp) {
-    inp.placeholder = on ? 'Listening — speak now…' : 'Type your message here…';
+    inp.placeholder = on ? 'Listening, speak now...' : 'Type your message here...';
     if (!on) inp.value = '';
   }
 }
@@ -733,9 +796,6 @@ function showLiveTranscript(text) {
   if (txt && text.trim()) txt.textContent = text;
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   Utilities
-───────────────────────────────────────────────────────────────────────────── */
 function esc(s) {
   var d = document.createElement('div');
   d.textContent = String(s);

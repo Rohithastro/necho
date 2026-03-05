@@ -1,6 +1,4 @@
-/* ============================================================
-   NECHO — NEW FULL SCREEN AUTH
-   ============================================================ */
+
 
 .auth-full-screen {
   min-height: 100vh;
@@ -15,7 +13,7 @@
 .auth-container {
   width: 100%;
   max-width: 860px;
-  /* Reduced for neatness */
+  
   background: #050505;
   display: flex;
   flex-direction: row;
@@ -34,7 +32,6 @@
   }
 }
 
-/* ── Left Side (Hero) ─────────────────────────────────────── */
 .auth-hero {
   flex: 0.9;
   background: #000;
@@ -55,7 +52,6 @@
   z-index: 20;
 }
 
-/* Blur strips simulation */
 .auth-strips {
   position: absolute;
   top: 0;
@@ -101,7 +97,6 @@
   z-index: 3;
 }
 
-/* ── Right Side (Form) ────────────────────────────────────── */
 .auth-form-side {
   flex: 1.1;
   background: #0a0a0a;
@@ -218,4 +213,32 @@
   font-size: 0.75rem;
   margin-top: 0.3rem;
   display: block;
+}
+
+.input-wrap {
+  position: relative;
+}
+
+.input-wrap .form-input-new {
+  padding-right: 2.6rem;
+}
+
+.pass-toggle {
+  position: absolute;
+  right: 0.7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.3);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+  outline: none;
+}
+
+.pass-toggle:hover {
+  color: rgba(255, 255, 255, 0.65);
 }

@@ -787,11 +787,11 @@
             </div>
             <div class="stat-card">
                 <div class="stat-label">Gesture</div>
-                <div class="stat-value" id="gestureValue">—</div>
+                <div class="stat-value" id="gestureValue">-</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Confidence</div>
-                <div class="stat-value" id="confidenceValue">—</div>
+                <div class="stat-value" id="confidenceValue">-</div>
             </div>
         </div>
 
@@ -833,7 +833,7 @@
             <!-- Recording indicator -->
             <div class="rec-bar" id="recBar" role="status" aria-live="polite">
                 <div class="rec-dot" aria-hidden="true"></div>
-                <span class="rec-label">Listening — speak now</span>
+                <span class="rec-label">Listening, speak now</span>
                 <button class="rec-stop" onclick="stopMic()" aria-label="Stop recording">Stop</button>
             </div>
 
@@ -928,9 +928,9 @@ function updateStatus() {
                 ? '<span class="badge badge-on">✓ Detected</span>'
                 : '<span class="badge badge-off">No Hand</span>';
 
-            document.getElementById('gestureValue').textContent    = data.gesture || '—';
+            document.getElementById('gestureValue').textContent    = data.gesture || '-';
             document.getElementById('confidenceValue').textContent = data.gesture
-                ? `${(data.confidence * 100).toFixed(1)}%` : '—';
+                ? `${(data.confidence * 100).toFixed(1)}%` : '-';
 
             const btn = document.getElementById('addGestureBtn');
             if (data.gesture) {
@@ -1077,7 +1077,7 @@ if (!micSupported) {
 } else if (!isSecureContext) {
     // Show non-blocking warning; don't disable the button yet
     window.addEventListener('DOMContentLoaded', () => {
-        toast('Mic needs HTTPS or localhost — open via http://localhost:PORT', 'warn');
+        toast('Mic needs HTTPS or localhost. Open via http://localhost:PORT', 'warn');
     });
 }
 
